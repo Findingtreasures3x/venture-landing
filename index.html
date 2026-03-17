@@ -528,9 +528,21 @@
     function EmailForm({ variant = "default" }) {
       const [e, se] = useState("");
       const [sub, ss] = useState(false);
+      const [sending, setSending] = useState(false);
+      const [err, setErr] = useState("");
       const h = (ev) => {
         ev.preventDefault();
-        if (e && e.includes("@")) ss(true);
+        if (!e || !e.includes("@")) return;
+        setSending(true);
+        setErr("");
+        fetch("https://script.google.com/macros/s/AKfycbw2gvCLf51Nh1qyXsnqjNzlBc5UYbjI2oUYsEsCIj6-Oi3LE1p9MQJtcBOmXrYKjMQc/exec", {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: e })
+        })
+          .then(() => { ss(true); setSending(false); })
+          .catch(() => { setErr("Something went wrong. Please try again."); setSending(false); });
       };
       if (sub)
         return (
@@ -598,22 +610,26 @@
           />
           <button
             type="submit"
+            disabled={sending}
             style={{
               padding: "14px 28px",
               borderRadius: 10,
               border: "none",
-              cursor: "pointer",
-              background: "linear-gradient(135deg, #E8653A, #D4520A)",
+              cursor: sending ? "wait" : "pointer",
+              background: sending ? "#999" : "linear-gradient(135deg, #E8653A, #D4520A)",
               color: "#fff",
               fontSize: 14,
               fontWeight: 700,
               fontFamily: "var(--f-body)",
-              boxShadow: "0 4px 20px rgba(232,101,58,0.3)",
-              whiteSpace: "nowrap"
+              boxShadow: sending ? "none" : "0 4px 20px rgba(232,101,58,0.3)",
+              whiteSpace: "nowrap",
+              opacity: sending ? 0.7 : 1,
+              transition: "all 0.3s ease"
             }}
           >
-            Join Waitlist
+            {sending ? "Joining..." : "Join Waitlist"}
           </button>
+          {err && <div style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>{err}</div>}
         </form>
       );
     }
