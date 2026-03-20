@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Venture - Your adventures deserve more than a camera roll</title>
-  <meta name="description" content="Venture turns real-world experiences into verified memory pages, collectible city stickers, and a personal world map of everywhere you've been.">
+  <meta name="description" content="Venture turns your travel memories into a personal passport — click a country, add your photos and stories, and build a beautiful collection of everywhere you've been.">
   <meta property="og:title" content="Venture - Your adventures deserve more than a camera roll">
-  <meta property="og:description" content="Venture turns real-world experiences into verified memory pages, collectible city stickers, and a personal world map of everywhere you've been.">
+  <meta property="og:description" content="Venture turns your travel memories into a personal passport — click a country, add your photos and stories, and build a beautiful collection of everywhere you've been.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120' fill='none' stroke=%235B8C5A stroke-width='5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 10 L50 75 L85 10'/%3E%3Cellipse cx='50' cy='95' rx='20' ry='8'/%3E%3C/svg%3E">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120' fill='none' stroke=%235B8C5A stroke-width='6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 10 L50 75 L85 10'/%3E%3Cellipse cx='50' cy='95' rx='20' ry='8'/%3E%3C/svg%3E">
@@ -76,22 +76,22 @@
       {
         emoji: "💑",
         title: "Couples",
-        desc: "Turn date nights into a shared adventure book. Every outing becomes a page you'll revisit on your anniversary."
+        desc: "Turn your trips together into a shared memory book. Every country you visit becomes a page you'll look back on together."
       },
       {
         emoji: "👥",
         title: "Friend Groups",
-        desc: "Collaborate on a shared storybook from your trip. Everyone adds their photos, one Venture captures the whole experience."
+        desc: "One passport for the whole crew. Add your photos and memories from the same trip, all in one place."
       },
       {
         emoji: "🧭",
         title: "Solo Explorers",
-        desc: "Build your personal passport. Track every city, every country, every monument. Your map fills up as you go."
+        desc: "Build your personal passport. Track every country, add your photos and stories. Your map fills up as you go."
       },
       {
         emoji: "🌍",
         title: "Travel Collectors",
-        desc: "See your world stats — countries visited, cities unlocked, continents explored. Venture makes your travel record tangible."
+        desc: "See your world come together — countries visited, continents explored. Venture makes your travel record tangible and beautiful."
       }
     ];
 
@@ -103,7 +103,7 @@
       { label: "Streak", value: "11w", icon: "🔥" }
     ];
 
-    function useInView(t = 0.15) {
+    function useInView(t = 0.05) {
       const r = useRef(null);
       const [v, s] = useState(false);
       useEffect(() => {
@@ -114,8 +114,13 @@
             s(true);
             o.disconnect();
           }
-        }, { threshold: t });
+        }, { threshold: t, rootMargin: "0px 0px 80px 0px" });
         o.observe(e);
+        // Fallback: if element is already in viewport on load, show it
+        const rect = e.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          s(true);
+        }
         return () => o.disconnect();
       }, []);
       return [r, v];
@@ -670,7 +675,7 @@
             href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&display=swap"
             rel="stylesheet"
           />
-          <style>{`:root{--f-display:'Fraunces',Georgia,serif;--f-body:'DM Sans',-apple-system,sans-serif;--orange:#5B8C5A;--accent:#5B8C5A;--bg:#F6F3ED;--bg-deep:#EDE8DF;--text:#3A4A5C;--text-soft:#7B8D9E;--text-muted:#B0BCCA;--card:#FFFFFF;--border:#DDD6CB}*{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}body{background:var(--bg);color:var(--text)}::selection{background:var(--accent);color:#fff}input::placeholder{color:var(--text-muted)}@keyframes float{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}`}</style>
+          <style>{`:root{--f-display:'Fraunces',Georgia,serif;--f-body:'DM Sans',-apple-system,sans-serif;--orange:#5B8C5A;--accent:#5B8C5A;--bg:#F6F3ED;--bg-deep:#EDE8DF;--text:#1F2E3D;--text-soft:#566B7F;--text-muted:#8A9BAD;--card:#FFFFFF;--border:#D4CCBF}*{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}body{background:var(--bg);color:var(--text)}::selection{background:var(--accent);color:#fff}input::placeholder{color:var(--text-muted)}@keyframes float{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}`}</style>
 
           <nav
             style={{
@@ -730,7 +735,7 @@
               alignItems: "center",
               justifyContent: "center",
               textAlign: "center",
-              padding: "120px 24px 60px",
+              padding: "100px 24px 40px",
               position: "relative"
             }}
           >
@@ -808,10 +813,9 @@
                   marginBottom: 36
                 }}
               >
-                Venture turns real-world experiences into verified memory pages,
-                collectible city stickers, and a personal world map of everywhere
-                you've been. Go alone, go with friends, go with your partner — and
-                keep it forever.
+                Turn your travels into a personal passport. Click a country,
+                add your photos and stories, and build a beautiful collection
+                of everywhere you've been — one memory at a time.
               </p>
             </FadeIn>
             <FadeIn delay={0.55}>
@@ -852,7 +856,7 @@
             </FadeIn>
           </section>
 
-          <section style={{ padding: "80px 24px", maxWidth: 560, margin: "0 auto" }}>
+          <section style={{ padding: "60px 24px 50px", maxWidth: 560, margin: "0 auto" }}>
             <FadeIn>
               <p
                 style={{
@@ -874,7 +878,7 @@
                   marginBottom: 8
                 }}
               >
-                One ritual. Every adventure.
+                Three steps. That's it.
               </h2>
               <p
                 style={{
@@ -884,55 +888,33 @@
                   marginBottom: 36
                 }}
               >
-                Whether it's a date night, a solo hike, or a trip across the world
-                — the loop is the same.
+                No complicated setup. No app to download. Just open the map and start building your passport.
               </p>
             </FadeIn>
             <LoopStep
               num={1}
-              icon="📍"
-              title="Go somewhere"
-              desc="A restaurant, a monument, a trailhead, a rooftop in a new city. Anywhere worth remembering."
+              icon="\u{1F30D}"
+              title="Pick a country"
+              desc="Click anywhere on the interactive world map. Every country is a blank page waiting for your story."
               delay={0.05}
             />
             <LoopStep
               num={2}
-              icon="📸"
-              title="Check in"
-              desc="Open Venture, confirm your GPS location, snap a photo. Takes seconds."
+              icon="\u{1F4F8}"
+              title="Add your memory"
+              desc="Upload your photos, write what you remember, mark the date and city. Make it yours."
               delay={0.1}
             />
             <LoopStep
               num={3}
-              icon="✅"
-              title="Get verified"
-              desc="Venture confirms you were actually there. Not a screenshot. Not a repost. Real proof."
-              delay={0.15}
-            />
-            <LoopStep
-              num={4}
-              icon="✨"
-              title="Unlock your collectible"
-              desc="Earn a city sticker and a unique Venture Stamp. New city? New country? Bonus unlocks."
-              delay={0.2}
-            />
-            <LoopStep
-              num={5}
-              icon="📖"
-              title="See your story page"
-              desc="Venture auto-generates a designed memory page with your photos, location, date, and stamp."
-              delay={0.25}
-            />
-            <LoopStep
-              num={6}
-              icon="🌍"
+              icon="\u{1F4D6}"
               title="Build your passport"
-              desc="Watch your world map fill up. Share your story page. Invite friends to collaborate on a shared Venture."
-              delay={0.3}
+              desc="Each country becomes a passport page with your photos, words, and a collectible sticker. Watch your collection grow."
+              delay={0.15}
             />
           </section>
 
-          <section style={{ padding: "60px 24px 80px" }}>
+          <section style={{ padding: "40px 24px 60px" }}>
             <FadeIn>
               <div style={{ textAlign: "center", marginBottom: 36 }}>
                 <p
@@ -986,7 +968,7 @@
           </section>
 
           <section
-            style={{ padding: "60px 24px 80px", maxWidth: 960, margin: "0 auto" }}
+            style={{ padding: "40px 24px 60px", maxWidth: 960, margin: "0 auto" }}
           >
             <FadeIn>
               <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -999,7 +981,7 @@
                     marginBottom: 10
                   }}
                 >
-                  TRY IT NOW
+                  TRY IT NOW — IT'S LIVE
                 </p>
                 <h2
                   style={{
@@ -1010,7 +992,7 @@
                     marginBottom: 8
                   }}
                 >
-                  See everywhere you've been
+                  Start building your passport
                 </h2>
                 <p
                   style={{
@@ -1021,7 +1003,7 @@
                     lineHeight: 1.6
                   }}
                 >
-                  Click countries to mark them visited, collect stickers, and build your personal travel passport. This is a live preview — go ahead, explore.
+                  This isn't a mockup — it's the real thing. Click any country, add your memories and photos, and watch your passport come to life.
                 </p>
               </div>
             </FadeIn>
@@ -1048,7 +1030,7 @@
           </section>
 
           <section
-            style={{ padding: "60px 24px 80px", maxWidth: 700, margin: "0 auto" }}
+            style={{ padding: "40px 24px 60px", maxWidth: 700, margin: "0 auto" }}
           >
             <FadeIn>
               <div style={{ textAlign: "center", marginBottom: 36 }}>
@@ -1134,7 +1116,7 @@
           </section>
 
           <section
-            style={{ padding: "60px 24px 80px", maxWidth: 600, margin: "0 auto" }}
+            style={{ padding: "40px 24px 60px", maxWidth: 600, margin: "0 auto" }}
           >
             <FadeIn>
               <p
@@ -1167,7 +1149,7 @@
                   marginBottom: 28
                 }}
               >
-                Here's what happens to your experiences right now — and what changes.
+                Here's where your travel memories go right now — and how Venture is different.
               </p>
             </FadeIn>
             <div
@@ -1199,22 +1181,22 @@
                 [
                   "Camera Roll",
                   "Photos pile up, never organized",
-                  "Every outing becomes a designed story page"
+                  "Photos organized by country with your story attached"
                 ],
                 [
                   "Instagram",
                   "Performative posts for an audience",
-                  "Personal keepsake you actually revisit"
+                  "A personal keepsake you actually look back on"
                 ],
                 [
                   "Shared Album",
-                  "Photo dump with no structure",
-                  "Collaborative, verified memory book"
+                  "Photo dump with no context",
+                  "Memories with dates, places, and your own words"
                 ],
                 [
                   "Google Maps",
-                  "A surveillance log of location data",
-                  "A world map of adventures you celebrate"
+                  "A list of places with no emotion",
+                  "A world map that shows the adventures behind each pin"
                 ]
               ].map(([p, b, a], i) => (
                 <FadeIn key={i} delay={i * 0.05}>
@@ -1247,7 +1229,7 @@
             </div>
           </section>
 
-          <section style={{ padding: "60px 24px 80px" }}>
+          <section style={{ padding: "40px 24px 60px" }}>
             <FadeIn>
               <div style={{ textAlign: "center", marginBottom: 36 }}>
                 <p
@@ -1281,7 +1263,7 @@
                     lineHeight: 1.6
                   }}
                 >
-                  Every new city unlocks a sticker. Every outing earns a stamp. Your
+                  Every country gets its own collectible sticker. Your
                   shelf grows with every adventure.
                 </p>
               </div>
@@ -1325,7 +1307,7 @@
 
           <section
             style={{
-              padding: "80px 24px 100px",
+              padding: "60px 24px 80px",
               textAlign: "center",
               position: "relative"
             }}
