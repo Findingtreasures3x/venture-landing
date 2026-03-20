@@ -811,6 +811,31 @@
               >
                 {count}+ people on the waitlist · Launching summer 2026
               </p>
+              <a
+                href="world-map.html"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginTop: 16,
+                  padding: "10px 22px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  background: "rgba(255,255,255,0.05)",
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  backdropFilter: "blur(8px)",
+                  fontFamily: "var(--f-body)"
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+              >
+                🗺️ Try the Interactive Map Preview
+              </a>
             </FadeIn>
             <FadeIn
               delay={0.7}
@@ -1456,4 +1481,3 @@
   </script>
 </body>
 </html>
-
