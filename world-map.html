@@ -1403,6 +1403,58 @@ function InteractiveWorldMap() {
                         </div>
                       )}
 
+                      {/* Edit & Delete actions */}
+                      <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+                        <button onClick={() => {
+                          const existing = memories[c.id];
+                          if (existing) {
+                            setMemoryDraft({
+                              note: existing.note || "",
+                              region: existing.region || "",
+                              city: existing.city || "",
+                              customLocation: existing.customLocation || "",
+                              month: existing.month || "",
+                              year: existing.year || "",
+                              photos: existing.photos || [],
+                            });
+                          } else {
+                            setMemoryDraft({ note: "", region: "", city: "", customLocation: "", month: "", year: "", photos: [] });
+                          }
+                          setShowMemoryModal(c.id);
+                        }} style={{
+                          flex: 1, padding: "12px 20px", borderRadius: 12,
+                          border: `1px solid ${C.accent}`, background: "transparent",
+                          color: C.accent, fontWeight: 600, fontSize: 13, cursor: "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = `${C.accent}15`; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                        >✏️ Edit Memory</button>
+                        <button onClick={() => {
+                          if (window.confirm(`Remove ${c.name} from your passport? This will delete your memory and photos for this country.`)) {
+                            setMemories(prev => {
+                              const next = { ...prev };
+                              delete next[c.id];
+                              return next;
+                            });
+                            setVisited(prev => {
+                              const next = new Set(prev);
+                              next.delete(c.id);
+                              return next;
+                            });
+                            setPassportPage(p => Math.max(0, p - 1));
+                          }
+                        }} style={{
+                          padding: "12px 20px", borderRadius: 12,
+                          border: "1px solid #e05555", background: "transparent",
+                          color: "#e05555", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#e0555515"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                        >🗑️ Delete</button>
+                      </div>
+
                       {/* Discovery fact */}
                       <div style={{
                         marginTop: 20, padding: "14px 18px", background: `${color}06`,
