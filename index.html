@@ -21,7 +21,7 @@
     const { useState, useEffect, useRef } = React;
 
     const CITIES = [
-      { emoji: "🗽", name: "NYC", color: "#E8653A" },
+      { emoji: "🗽", name: "NYC", color: "#5B8C5A" },
       { emoji: "🌴", name: "Miami", color: "#00897B" },
       { emoji: "🗼", name: "Paris", color: "#8E24AA" },
       { emoji: "🌉", name: "SF", color: "#D4880A" },
@@ -30,7 +30,7 @@
       { emoji: "🌺", name: "Honolulu", color: "#E84393" },
       { emoji: "🏛️", name: "Rome", color: "#C0392B" },
       { emoji: "🎭", name: "London", color: "#5B6ABF" },
-      { emoji: "🌮", name: "Mexico City", color: "#D4520A" }
+      { emoji: "🌮", name: "Mexico City", color: "#3A7A39" }
     ];
 
     const VENTURES = [
@@ -39,8 +39,8 @@
         loc: "Hudson Yards, NYC",
         date: "Mar 7",
         emoji: "🗽",
-        color: "#E8653A",
-        accent: "#FFB347",
+        color: "#5B8C5A",
+        accent: "#8BB58A",
         num: 14,
         img: "https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=75"
       },
@@ -385,7 +385,7 @@
             background: "rgba(91,140,90,0.04)",
             borderRadius: 16,
             margin: "0 auto",
-            border: "1px solid rgba(255,255,255,0.05)",
+            border: "1px solid var(--border)",
             overflow: "hidden"
           }}
         >
@@ -433,7 +433,7 @@
                     width: c.s,
                     height: c.s,
                     borderRadius: "50%",
-                    background: "#E8653A"
+                    background: "#5B8C5A"
                   }}
                 />
               </div>
@@ -504,12 +504,12 @@
               { v: "4", l: "Continents" }
             ].map((s, i) => (
               <div key={i} style={{ textAlign: "center" }}>
-                <div style={{ color: "#E8653A", fontSize: 14, fontWeight: 700 }}>
+                <div style={{ color: "#5B8C5A", fontSize: 14, fontWeight: 700 }}>
                   {s.v}
                 </div>
                 <div
                   style={{
-                    color: "rgba(255,255,255,0.35)",
+                    color: "var(--text-muted)",
                     fontSize: 8,
                     fontWeight: 600,
                     letterSpacing: "0.05em"
@@ -811,31 +811,6 @@
               >
                 {count}+ people on the waitlist · Launching summer 2026
               </p>
-              <a
-                href="world-map.html"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginTop: 16,
-                  padding: "10px 22px",
-                  borderRadius: 10,
-                  border: "1px solid var(--border)",
-                  background: "var(--card)",
-                  color: "var(--text-soft)",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  boxShadow: "0 2px 8px rgba(58,74,92,0.06)",
-                  fontFamily: "var(--f-body)"
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = "var(--accent)"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "var(--accent)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "var(--card)"; e.currentTarget.style.color = "var(--text-soft)"; e.currentTarget.style.borderColor = "var(--border)"; }}
-              >
-                🗺️ Try the Interactive Map Preview
-              </a>
             </FadeIn>
             <FadeIn
               delay={0.7}
@@ -995,7 +970,7 @@
           </section>
 
           <section
-            style={{ padding: "60px 24px 80px", maxWidth: 640, margin: "0 auto" }}
+            style={{ padding: "60px 24px 80px", maxWidth: 960, margin: "0 auto" }}
           >
             <FadeIn>
               <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -1008,7 +983,7 @@
                     marginBottom: 10
                   }}
                 >
-                  YOUR WORLD
+                  TRY IT NOW
                 </p>
                 <h2
                   style={{
@@ -1025,54 +1000,33 @@
                   style={{
                     color: "var(--text-soft)",
                     fontSize: 14,
-                    maxWidth: 440,
+                    maxWidth: 480,
                     margin: "0 auto",
                     lineHeight: 1.6
                   }}
                 >
-                  Your personal world map fills up with every verified check-in.
-                  Track countries, cities, monuments, and landmarks.
+                  Click countries to mark them visited, collect stickers, and build your personal travel passport. This is a live preview — go ahead, explore.
                 </p>
               </div>
             </FadeIn>
             <FadeIn delay={0.15}>
-              <WorldMap />
-            </FadeIn>
-            <FadeIn delay={0.25}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 24,
-                  marginTop: 24,
-                  flexWrap: "wrap"
-                }}
-              >
-                {WORLD_STATS.map((s, i) => (
-                  <div key={i} style={{ textAlign: "center", minWidth: 60 }}>
-                    <div style={{ fontSize: 16, marginBottom: 2 }}>{s.icon}</div>
-                    <div
-                      style={{
-                        color: "var(--text)",
-                        fontSize: 22,
-                        fontWeight: 700,
-                        fontFamily: "var(--f-display)"
-                      }}
-                    >
-                      {s.value}
-                    </div>
-                    <div
-                      style={{
-                        color: "var(--text-muted)",
-                        fontSize: 9,
-                        fontWeight: 600,
-                        letterSpacing: "0.06em"
-                      }}
-                    >
-                      {s.label.toUpperCase()}
-                    </div>
-                  </div>
-                ))}
+              <div style={{
+                borderRadius: 20,
+                border: "1px solid var(--border)",
+                overflow: "hidden",
+                boxShadow: "0 8px 40px rgba(58,74,92,0.08)",
+                background: "var(--card)"
+              }}>
+                <iframe
+                  src="world-map.html"
+                  style={{
+                    width: "100%",
+                    height: 640,
+                    border: "none",
+                    display: "block"
+                  }}
+                  title="Interactive World Map Preview"
+                />
               </div>
             </FadeIn>
           </section>
@@ -1117,7 +1071,7 @@
                   <div
                     style={{
                       background: "rgba(91,140,90,0.04)",
-                      border: "1px solid rgba(255,255,255,0.06)",
+                      border: "1px solid var(--border)",
                       borderRadius: 14,
                       padding: "24px 22px",
                       transition: "border-color 0.3s, background 0.3s",
@@ -1204,7 +1158,7 @@
               style={{
                 background: "rgba(91,140,90,0.04)",
                 borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.05)",
+                border: "1px solid var(--border)",
                 overflow: "hidden"
               }}
             >
@@ -1212,7 +1166,7 @@
                 style={{
                   display: "grid",
                   gridTemplateColumns: "110px 1fr 1fr",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
+                  borderBottom: "1px solid var(--border)",
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: "0.08em",
@@ -1253,7 +1207,7 @@
                       display: "grid",
                       gridTemplateColumns: "110px 1fr 1fr",
                       borderBottom:
-                        i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                        i < 3 ? "1px solid var(--border)" : "none",
                       fontSize: 13
                     }}
                   >
@@ -1263,12 +1217,12 @@
                     <div
                       style={{
                         padding: "14px 12px",
-                        color: "rgba(255,255,255,0.35)"
+                        color: "var(--text-muted)"
                       }}
                     >
                       {b}
                     </div>
-                    <div style={{ padding: "14px 12px", color: "#E8653A", fontWeight: 500 }}>
+                    <div style={{ padding: "14px 12px", color: "#5B8C5A", fontWeight: 500 }}>
                       {a}
                     </div>
                   </div>
