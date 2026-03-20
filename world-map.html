@@ -22,12 +22,12 @@
   <script type="text/babel">
 const { useState, useEffect, useCallback, useRef, useMemo } = React;
 
-// d3-geo is loaded as a global script — access projection functions from d3
+// d3-geo is loaded as a global script â access projection functions from d3
 const d3 = window.d3;
 
-// ─── Color Palette ───────────────────────────────────────────
+// âââ Color Palette âââââââââââââââââââââââââââââââââââââââââââ
 // Science-backed: soft blues lower cortisol, sage greens evoke harmony,
-// warm earth tones invite comfort. No orange — calming & grounding.
+// warm earth tones invite comfort. No orange â calming & grounding.
 const C = {
   bg: "#F6F3ED",             // warm parchment
   bgDeep: "#EDE8DF",         // deeper parchment
@@ -35,8 +35,8 @@ const C = {
   text: "#3A4A5C",           // deep slate (not black)
   textSoft: "#7B8D9E",       // muted blue-gray
   textMuted: "#B0BCCA",      // whisper text
-  accent: "#5B8C5A",         // sage green — primary accent
-  accentWarm: "#C07654",     // warm terracotta — secondary
+  accent: "#5B8C5A",         // sage green â primary accent
+  accentWarm: "#C07654",     // warm terracotta â secondary
   accentSoft: "#8BB58A",     // light sage
   ocean: "#DFE9F0",          // soft blue for water
   land: "#E2DDD5",           // neutral land
@@ -45,7 +45,7 @@ const C = {
   borderLight: "#EDE8DF",    // subtle divider
   shadow: "rgba(58,74,92,0.06)",
   shadowDeep: "rgba(58,74,92,0.12)",
-  // Continent colors — soft, nature-inspired
+  // Continent colors â soft, nature-inspired
   cont: {
     "North America": "#5B8C5A",  // sage forest
     "South America": "#3A9679",  // tropical teal
@@ -56,176 +56,176 @@ const C = {
   },
 };
 
-// ─── All 195 Countries ──────────────────────────────────────
+// âââ All 195 Countries ââââââââââââââââââââââââââââââââââââââ
 const COUNTRY_DATA = {
-  "004": { name: "Afghanistan", sticker: { icon: "🏔️", title: "Hindu Kush", desc: "Where empires came to rest" }, continent: "Asia", discover: "The Hindu Kush mountains hold passes that connected ancient civilizations for millennia" },
-  "008": { name: "Albania", sticker: { icon: "🦅", title: "Eagle's Nest", desc: "Balkan sanctuary of wild shores" }, continent: "Europe", discover: "Has over 750,000 concrete bunkers — more per capita than any country on Earth" },
-  "012": { name: "Algeria", sticker: { icon: "🏜️", title: "Saharan Gate", desc: "Africa's vast golden threshold" }, continent: "Africa", discover: "The largest country in Africa — 80% of its territory is Sahara Desert" },
-  "024": { name: "Angola", sticker: { icon: "💎", title: "Diamond Coast", desc: "Riches beneath red earth" }, continent: "Africa", discover: "The Kalandula Falls are among the largest waterfalls in Africa by volume" },
-  "032": { name: "Argentina", sticker: { icon: "🥩", title: "Fin del Mundo", desc: "Edge of the earth" }, continent: "South America", discover: "Ushuaia is the southernmost city in the world — the gateway to Antarctica" },
-  "031": { name: "Azerbaijan", sticker: { icon: "🔥", title: "Eternal Flames", desc: "Land of fire since antiquity" }, continent: "Asia", discover: "Natural gas fires have burned continuously on its hillsides for thousands of years" },
-  "036": { name: "Australia", sticker: { icon: "🪃", title: "Outback", desc: "Oldest living culture on Earth" }, continent: "Oceania", discover: "Aboriginal Australians are the world's oldest continuous civilization — 65,000+ years" },
-  "040": { name: "Austria", sticker: { icon: "🎼", title: "Alpine Symphony", desc: "Where classical music was born" }, continent: "Europe", discover: "Vienna has produced more famous composers than any other city in history" },
-  "051": { name: "Armenia", sticker: { icon: "✝️", title: "First Christian Nation", desc: "Faith carved in ancient stone" }, continent: "Asia", discover: "Became the first country to adopt Christianity as its state religion in 301 AD" },
-  "044": { name: "Bahamas", sticker: { icon: "🏝️", title: "Azure Shallows", desc: "Turquoise waters of eternal summer" }, continent: "North America", discover: "Has over 700 islands but only 30 are inhabited — the rest are pristine wilderness" },
-  "050": { name: "Bangladesh", sticker: { icon: "🌾", title: "Delta of Life", desc: "Where rivers braid into the sea" }, continent: "Asia", discover: "The Sundarbans mangrove forest is the largest in the world and home to Bengal tigers" },
-  "112": { name: "Belarus", sticker: { icon: "🌲", title: "Primeval Forest", desc: "Europe's last untouched wilderness" }, continent: "Europe", discover: "The Białowieża Forest is one of Europe's last primeval forests — home to wild European bison" },
-  "056": { name: "Belgium", sticker: { icon: "🍫", title: "Chocolate Kingdom", desc: "Sweet craft perfected over centuries" }, continent: "Europe", discover: "Brussels Airport is the world's largest chocolate seller — 800 tons per year" },
-  "084": { name: "Belize", sticker: { icon: "🐆", title: "Jaguar's Domain", desc: "Jungle hides ancient Maya secrets" }, continent: "North America", discover: "The Great Blue Hole is a massive underwater sinkhole visible from space" },
-  "204": { name: "Benin", sticker: { icon: "🥁", title: "Voodoo Roots", desc: "Where spiritual traditions were born" }, continent: "Africa", discover: "The birthplace of Voodoo — practiced here as an official religion by millions" },
-  "064": { name: "Bhutan", sticker: { icon: "🐉", title: "Thunder Dragon", desc: "Happiness measured, not GDP" }, continent: "Asia", discover: "The only country that measures Gross National Happiness instead of GDP" },
-  "068": { name: "Bolivia", sticker: { icon: "⛰️", title: "Salt Mirror", desc: "Sky reflected in endless white" }, continent: "South America", discover: "Salar de Uyuni is the world's largest salt flat — it becomes a perfect mirror when wet" },
-  "070": { name: "Bosnia and Herzegovina", sticker: { icon: "🌉", title: "Stari Most", desc: "A bridge rebuilt from memory" }, continent: "Europe", discover: "The Stari Most bridge was destroyed in 1993, then rebuilt stone by stone from the riverbed" },
-  "072": { name: "Botswana", sticker: { icon: "🐘", title: "Okavango", desc: "A river that never reaches the sea" }, continent: "Africa", discover: "The Okavango Delta is the world's largest inland delta — it floods in the desert" },
-  "076": { name: "Brazil", sticker: { icon: "💚", title: "Alma Carioca", desc: "Rhythm runs deep" }, continent: "South America", discover: "The Amazon produces 20% of the world's oxygen and holds 10% of all species on Earth" },
-  "096": { name: "Brunei", sticker: { icon: "👑", title: "Golden Sultanate", desc: "Oil-rich jewel of Borneo" }, continent: "Asia", discover: "One of the world's wealthiest nations per capita — no income tax for citizens" },
-  "100": { name: "Bulgaria", sticker: { icon: "🌹", title: "Rose Valley", desc: "Fragrance bottled for the world" }, continent: "Europe", discover: "Produces 70% of the world's rose oil — concentrated in the Valley of Roses" },
-  "854": { name: "Burkina Faso", sticker: { icon: "🎭", title: "Land of the Upright", desc: "Integrity woven into the name" }, continent: "Africa", discover: "Hosts FESPACO, Africa's largest and oldest film festival, drawing filmmakers from across the continent" },
-  "108": { name: "Burundi", sticker: { icon: "🥁", title: "Drum Heart", desc: "Rhythm from the Great Lakes" }, continent: "Africa", discover: "The Royal Drummers of Burundi have performed their sacred rhythms for over 400 years" },
-  "116": { name: "Cambodia", sticker: { icon: "🕉️", title: "Angkor", desc: "Temples reclaimed by the jungle" }, continent: "Asia", discover: "Angkor Wat is the largest religious monument ever built — visible from space" },
-  "120": { name: "Cameroon", sticker: { icon: "🌋", title: "Africa in Miniature", desc: "Every African landscape in one country" }, continent: "Africa", discover: "Called 'Africa in Miniature' because it contains every major climate and landscape found on the continent" },
-  "124": { name: "Canada", sticker: { icon: "🍁", title: "True North", desc: "Wild and boundless" }, continent: "North America", discover: "Has more lakes than all other countries on Earth combined" },
-  "140": { name: "Central African Republic", sticker: { icon: "🌿", title: "Green Heart", desc: "Equatorial forest holds ancient secrets" }, continent: "Africa", discover: "The Dzanga-Sangha Reserve is one of the last places on Earth to see forest elephants in the wild" },
-  "148": { name: "Chad", sticker: { icon: "🐪", title: "Saharan Crossroads", desc: "Where desert meets savanna" }, continent: "Africa", discover: "Lake Chad has shrunk by 90% in 50 years — one of the world's worst ecological disasters" },
-  "152": { name: "Chile", sticker: { icon: "🌋", title: "Tierra del Fuego", desc: "Land of fire" }, continent: "South America", discover: "The Atacama Desert is the driest place on Earth — some spots haven't seen rain in recorded history" },
-  "156": { name: "China", sticker: { icon: "🐉", title: "Middle Kingdom", desc: "5,000 years deep" }, continent: "Asia", discover: "The Great Wall spans over 13,000 miles — it's not one wall but many, built over centuries" },
-  "170": { name: "Colombia", sticker: { icon: "💎", title: "El Dorado", desc: "The golden one" }, continent: "South America", discover: "Has more bird species than any country on Earth — over 1,900 documented species" },
-  "180": { name: "Congo (DRC)", sticker: { icon: "🌊", title: "Mighty River", desc: "The deepest river on Earth" }, continent: "Africa", discover: "The Congo River is the world's deepest river — over 720 feet in places" },
-  "178": { name: "Congo (Republic)", sticker: { icon: "🌴", title: "Equatorial Green", desc: "Rainforest absorbs the world's carbon" }, continent: "Africa", discover: "Over 70% forested — one of the few countries on Earth with negative carbon emissions" },
-  "188": { name: "Costa Rica", sticker: { icon: "🦋", title: "Pura Vida", desc: "Pure life, no army needed" }, continent: "North America", discover: "Abolished its military in 1948 and spends the money on education and nature instead" },
-  "191": { name: "Croatia", sticker: { icon: "🏖️", title: "Adriatic Jewel", desc: "A thousand islands in crystal water" }, continent: "Europe", discover: "Has over 1,200 islands — Dubrovnik's Old Town doubled as King's Landing in Game of Thrones" },
-  "192": { name: "Cuba", sticker: { icon: "🚗", title: "Frozen in Time", desc: "Vintage chrome on Caribbean streets" }, continent: "North America", discover: "Has more 1950s American cars still running than anywhere else on Earth" },
-  "196": { name: "Cyprus", sticker: { icon: "🌊", title: "Aphrodite's Shore", desc: "Where the goddess was born" }, continent: "Europe", discover: "Legend says Aphrodite rose from the sea foam near Paphos — you can visit the exact rock" },
-  "203": { name: "Czech Republic", sticker: { icon: "🍺", title: "Bohemian Dream", desc: "More beer per person than anywhere" }, continent: "Europe", discover: "Has the highest beer consumption per capita in the world — Pilsner was invented here" },
-  "208": { name: "Denmark", sticker: { icon: "🚴", title: "Hygge", desc: "The art of cozy contentment" }, continent: "Europe", discover: "Copenhagen has more bikes than people and was rated the world's happiest city" },
-  "262": { name: "Djibouti", sticker: { icon: "⚓", title: "Red Sea Gate", desc: "Strategic crossroads of continents" }, continent: "Africa", discover: "Lake Assal is the lowest point in Africa and one of the saltiest bodies of water on Earth" },
-  "214": { name: "Dominican Republic", sticker: { icon: "🏖️", title: "Merengue Shore", desc: "Rhythm meets white sand" }, continent: "North America", discover: "Santo Domingo was the first European settlement in the Americas — founded in 1496" },
-  "218": { name: "Ecuador", sticker: { icon: "🐢", title: "Galápagos", desc: "Where Darwin saw evolution" }, continent: "South America", discover: "The Galápagos Islands inspired Darwin's theory of evolution — each island has unique species" },
-  "818": { name: "Egypt", sticker: { icon: "🔺", title: "Eternal", desc: "Monuments to forever" }, continent: "Africa", discover: "The Great Pyramid was the tallest structure on Earth for 3,800 years straight" },
-  "222": { name: "El Salvador", sticker: { icon: "🌋", title: "Land of Volcanoes", desc: "Fire shapes the smallest Central American nation" }, continent: "North America", discover: "Has 23 active volcanoes and was the first country to adopt Bitcoin as legal tender" },
-  "226": { name: "Equatorial Guinea", sticker: { icon: "🌿", title: "Bioko Island", desc: "Volcanic island in the Gulf of Guinea" }, continent: "Africa", discover: "The only African country where Spanish is the primary official language" },
-  "232": { name: "Eritrea", sticker: { icon: "🚂", title: "Red Sea Nation", desc: "Italian-built railway climbs the escarpment" }, continent: "Africa", discover: "Asmara's Art Deco architecture earned it UNESCO World Heritage status" },
-  "233": { name: "Estonia", sticker: { icon: "💻", title: "Digital Republic", desc: "The world's most wired nation" }, continent: "Europe", discover: "Skype was invented here — Estonia was the first country to offer e-residency to anyone on Earth" },
-  "748": { name: "Eswatini", sticker: { icon: "👑", title: "Reed Dance", desc: "Africa's last absolute monarchy" }, continent: "Africa", discover: "The annual Reed Dance ceremony brings together over 40,000 young women in cultural celebration" },
-  "231": { name: "Ethiopia", sticker: { icon: "☕", title: "Coffee's Birthplace", desc: "Where a goat herder changed the world" }, continent: "Africa", discover: "The birthplace of coffee — and the only African country never colonized by a European power" },
-  "242": { name: "Fiji", sticker: { icon: "🌺", title: "Coral Kingdom", desc: "333 islands in the South Pacific" }, continent: "Oceania", discover: "One of the first places on Earth to see each new day — right near the International Date Line" },
-  "246": { name: "Finland", sticker: { icon: "🌌", title: "Northern Lights", desc: "Aurora dances above frozen lakes" }, continent: "Europe", discover: "Has more saunas than cars — 3.3 million saunas for 5.5 million people" },
-  "250": { name: "France", sticker: { icon: "🥐", title: "L'Art de Vivre", desc: "The art of living" }, continent: "Europe", discover: "The most visited country on Earth — 89 million tourists per year choose France" },
-  "266": { name: "Gabon", sticker: { icon: "🦍", title: "Gorilla Sanctuary", desc: "Rainforest protects gentle giants" }, continent: "Africa", discover: "Over 85% forested — one of the last strongholds of western lowland gorillas" },
-  "270": { name: "Gambia", sticker: { icon: "🦅", title: "River Nation", desc: "Africa's smallest mainland country" }, continent: "Africa", discover: "Entirely surrounds the Gambia River and is completely enclosed by Senegal on three sides" },
-  "268": { name: "Georgia", sticker: { icon: "🍷", title: "Wine Cradle", desc: "8,000 years of winemaking" }, continent: "Asia", discover: "Archaeological evidence shows wine was first made here 8,000 years ago — the oldest in the world" },
-  "276": { name: "Germany", sticker: { icon: "🏰", title: "Wanderlust", desc: "They invented the word" }, continent: "Europe", discover: "Has over 25,000 castles — more than any other country in Europe" },
-  "288": { name: "Ghana", sticker: { icon: "🥁", title: "Gold Coast", desc: "First free nation south of the Sahara" }, continent: "Africa", discover: "Was the first sub-Saharan African country to gain independence in 1957" },
-  "300": { name: "Greece", sticker: { icon: "🏛️", title: "Birthplace", desc: "Where it all began" }, continent: "Europe", discover: "The first Olympic Games were held here in 776 BC — nearly 3,000 years ago" },
-  "320": { name: "Guatemala", sticker: { icon: "🌽", title: "Maya Heartland", desc: "Pyramids older than you'd think" }, continent: "North America", discover: "Tikal's pyramids rise above the jungle canopy — some are taller than a 20-story building" },
-  "324": { name: "Guinea", sticker: { icon: "💧", title: "Water Tower", desc: "Source of West Africa's great rivers" }, continent: "Africa", discover: "Called the 'Water Tower of West Africa' — the Niger, Senegal, and Gambia rivers all start here" },
-  "624": { name: "Guinea-Bissau", sticker: { icon: "🐢", title: "Bijagós Islands", desc: "An archipelago time forgot" }, continent: "Africa", discover: "The Bijagós Archipelago is one of the last pristine island ecosystems in the world" },
-  "328": { name: "Guyana", sticker: { icon: "🌿", title: "El Dorado's Land", desc: "Rainforest hides golden legends" }, continent: "South America", discover: "Kaieteur Falls is four times taller than Niagara — one of the world's most powerful waterfalls" },
-  "332": { name: "Haiti", sticker: { icon: "🏝️", title: "First Free", desc: "The first Black republic" }, continent: "North America", discover: "The first successful slave revolution in history — gained independence from France in 1804" },
-  "340": { name: "Honduras", sticker: { icon: "🐠", title: "Bay Islands", desc: "Caribbean reef diving paradise" }, continent: "North America", discover: "The Bay Islands sit on the Mesoamerican Barrier Reef — second-largest coral system on Earth" },
-  "348": { name: "Hungary", sticker: { icon: "♨️", title: "Thermal Baths", desc: "Budapest floats on hot springs" }, continent: "Europe", discover: "Budapest has more thermal springs than any capital city — some baths are 500 years old" },
-  "352": { name: "Iceland", sticker: { icon: "❄️", title: "Fire & Ice", desc: "Edge of the known world" }, continent: "Europe", discover: "You can see two tectonic plates meeting with your own eyes in Þingvellir" },
-  "356": { name: "India", sticker: { icon: "🪔", title: "A Million Colors", desc: "Sensory overload in the best way" }, continent: "Asia", discover: "Kumbh Mela draws 150 million people — the largest peaceful gathering in human history" },
-  "360": { name: "Indonesia", sticker: { icon: "🌺", title: "Nusantara", desc: "17,000 islands" }, continent: "Asia", discover: "The largest archipelago on Earth — spread across 17,508 islands and three time zones" },
-  "364": { name: "Iran", sticker: { icon: "🌹", title: "Persia", desc: "Empires and poetry" }, continent: "Asia", discover: "Persepolis was the ceremonial capital of one of the largest empires in ancient history" },
-  "368": { name: "Iraq", sticker: { icon: "🏛️", title: "Cradle of Writing", desc: "Where humanity first wrote things down" }, continent: "Asia", discover: "The Sumerians invented writing here around 3400 BC — the oldest known script on Earth" },
-  "372": { name: "Ireland", sticker: { icon: "🍀", title: "Emerald Isle", desc: "40 shades of green" }, continent: "Europe", discover: "Has more sheep than people and produced four Nobel Literature laureates from a tiny population" },
-  "376": { name: "Israel", sticker: { icon: "🕎", title: "Promised Land", desc: "Three faiths, one ancient city" }, continent: "Asia", discover: "The Dead Sea is the lowest point on Earth's surface — you float without trying" },
-  "380": { name: "Italy", sticker: { icon: "🍷", title: "La Dolce Vita", desc: "The sweet life" }, continent: "Europe", discover: "Has more UNESCO World Heritage sites than any nation on Earth — 58 and counting" },
-  "384": { name: "Ivory Coast", sticker: { icon: "🍫", title: "Cocoa Empire", desc: "Chocolate's secret source" }, continent: "Africa", discover: "Produces 30% of the world's cocoa — more than any other country" },
-  "388": { name: "Jamaica", sticker: { icon: "🎶", title: "Reggae Nation", desc: "One island changed world music" }, continent: "North America", discover: "Bob Marley's music made this tiny island one of the most culturally influential nations on Earth" },
-  "392": { name: "Japan", sticker: { icon: "⛩️", title: "Wabi-Sabi", desc: "Beauty in imperfection" }, continent: "Asia", discover: "Has over 6,800 islands and more vending machines per capita than anywhere else" },
-  "400": { name: "Jordan", sticker: { icon: "🏜️", title: "Rose City", desc: "Carved entirely from pink stone" }, continent: "Asia", discover: "Petra was carved directly into rose-red cliff faces over 2,000 years ago" },
-  "398": { name: "Kazakhstan", sticker: { icon: "🐴", title: "Steppe Riders", desc: "Endless grasslands under infinite sky" }, continent: "Asia", discover: "The world's largest landlocked country — bigger than all of Western Europe combined" },
-  "404": { name: "Kenya", sticker: { icon: "🌄", title: "The Migration", desc: "Life in motion" }, continent: "Africa", discover: "The Great Migration moves 2 million wildebeest across the Serengeti every year" },
-  "414": { name: "Kuwait", sticker: { icon: "🛢️", title: "Oil Oasis", desc: "Desert wealth" }, continent: "Asia", discover: "Has approximately 7% of the world's known oil reserves beneath its small territory" },
-  "417": { name: "Kyrgyzstan", sticker: { icon: "⛰️", title: "Celestial Mountains", desc: "Yurt life above the clouds" }, continent: "Asia", discover: "93% of the country is mountainous — many communities still live as semi-nomadic yurt dwellers" },
-  "418": { name: "Laos", sticker: { icon: "🏯", title: "Million Elephants", desc: "Mekong flows through ancient kingdoms" }, continent: "Asia", discover: "The most heavily bombed country per capita in history, yet radiates peaceful Buddhist culture" },
-  "428": { name: "Latvia", sticker: { icon: "🎵", title: "Song Festival", desc: "30,000 voices become one" }, continent: "Europe", discover: "The Latvian Song Festival brings 30,000+ singers together — recognized by UNESCO" },
-  "422": { name: "Lebanon", sticker: { icon: "🌲", title: "Cedar Country", desc: "The tree on the flag is 5,000 years old" }, continent: "Asia", discover: "The Cedars of God are among the last remnants of forests that once covered ancient Mesopotamia" },
-  "426": { name: "Lesotho", sticker: { icon: "⛰️", title: "Kingdom in the Sky", desc: "The highest low point of any country" }, continent: "Africa", discover: "The only country in the world where every square inch is above 1,000 meters elevation" },
-  "430": { name: "Liberia", sticker: { icon: "🌴", title: "Freedom's Coast", desc: "Founded by freed American slaves" }, continent: "Africa", discover: "Founded in 1822 by freed African Americans — its capital Monrovia is named after James Monroe" },
-  "434": { name: "Libya", sticker: { icon: "🏛️", title: "Roman Ruins", desc: "Ancient columns still standing in sand" }, continent: "Africa", discover: "Leptis Magna is one of the best-preserved Roman cities anywhere — rivaling Pompeii" },
-  "440": { name: "Lithuania", sticker: { icon: "✝️", title: "Hill of Crosses", desc: "Thousands of crosses placed by pilgrims" }, continent: "Europe", discover: "The Hill of Crosses has over 100,000 crosses — torn down by Soviets, rebuilt each time by locals" },
-  "442": { name: "Luxembourg", sticker: { icon: "🏰", title: "Tiny Powerhouse", desc: "Europe's wealthiest per person" }, continent: "Europe", discover: "Has the highest GDP per capita in the world and more castles per square km than anywhere" },
-  "450": { name: "Madagascar", sticker: { icon: "🦎", title: "Island Apart", desc: "90% of species found nowhere else" }, continent: "Africa", discover: "Split from India 88 million years ago — its isolation created species that exist nowhere else on Earth" },
-  "454": { name: "Malawi", sticker: { icon: "🐠", title: "Lake of Stars", desc: "More fish species than any lake on Earth" }, continent: "Africa", discover: "Lake Malawi holds more fish species than any other lake — over 1,000, most found nowhere else" },
-  "458": { name: "Malaysia", sticker: { icon: "🏙️", title: "Twin Towers", desc: "Petronas pierces the tropical sky" }, continent: "Asia", discover: "The Petronas Twin Towers were the world's tallest buildings for six years" },
-  "466": { name: "Mali", sticker: { icon: "📚", title: "Timbuktu", desc: "Legendary city of scholars" }, continent: "Africa", discover: "Timbuktu was one of the world's great centers of learning — its libraries held 700,000 manuscripts" },
-  "478": { name: "Mauritania", sticker: { icon: "🏜️", title: "Saharan Expanse", desc: "Endless dunes" }, continent: "Africa", discover: "The Richat Structure (Eye of the Sahara) is a 30-mile wide geological formation visible from space" },
-  "484": { name: "Mexico", sticker: { icon: "🌶️", title: "Corazón de Fuego", desc: "Heart of fire" }, continent: "North America", discover: "Birthplace of chocolate, chili peppers, and corn — foods that changed the world" },
-  "498": { name: "Moldova", sticker: { icon: "🍷", title: "Underground Cellars", desc: "World's largest wine collection" }, continent: "Europe", discover: "Mileștii Mici holds the Guinness record for the world's largest wine collection — 2 million bottles" },
-  "496": { name: "Mongolia", sticker: { icon: "🐴", title: "Khan's Steppe", desc: "The largest empire started here" }, continent: "Asia", discover: "Genghis Khan built the largest contiguous land empire in history from these steppes" },
-  "499": { name: "Montenegro", sticker: { icon: "⛰️", title: "Black Mountain", desc: "Europe's deepest fjord" }, continent: "Europe", discover: "The Bay of Kotor is Europe's southernmost fjord — surrounded by mountains that plunge into the sea" },
-  "504": { name: "Morocco", sticker: { icon: "🫖", title: "Medina Walker", desc: "Lost in the souk" }, continent: "Africa", discover: "Fez's University of al-Qarawiyyin was founded in 859 AD — the oldest still-operating university on Earth" },
-  "508": { name: "Mozambique", sticker: { icon: "🌊", title: "Bazaruto", desc: "Indian Ocean pearl" }, continent: "Africa", discover: "The Bazaruto Archipelago has some of the last remaining dugong populations in East Africa" },
-  "104": { name: "Myanmar", sticker: { icon: "🕉️", title: "Golden Pagodas", desc: "Shwedagon glows at twilight" }, continent: "Asia", discover: "Bagan has over 2,000 ancient Buddhist temples spread across a single plain" },
-  "516": { name: "Namibia", sticker: { icon: "🏜️", title: "Skeleton Coast", desc: "Where desert meets the sea" }, continent: "Africa", discover: "The Namib Desert is the oldest desert on Earth — 55 to 80 million years old" },
-  "524": { name: "Nepal", sticker: { icon: "🏔️", title: "Roof of the World", desc: "Where the sky begins" }, continent: "Asia", discover: "Has 8 of the world's 14 highest peaks, including Everest at 8,849 meters" },
-  "528": { name: "Netherlands", sticker: { icon: "🌷", title: "Below Sea Level", desc: "Built on water" }, continent: "Europe", discover: "A third of the country is below sea level — protected by an engineering marvel of dikes" },
-  "554": { name: "New Zealand", sticker: { icon: "🌿", title: "Aotearoa", desc: "Land of the long white cloud" }, continent: "Oceania", discover: "Was the last large landmass settled by humans — the Māori arrived around 1300 AD" },
-  "558": { name: "Nicaragua", sticker: { icon: "🌴", title: "Land of Lakes", desc: "Freshwater sharks in a tropical lake" }, continent: "North America", discover: "Lake Nicaragua is the only freshwater lake on Earth that has bull sharks" },
-  "562": { name: "Niger", sticker: { icon: "🐪", title: "Sahel Gateway", desc: "Where Sahara gives way to green" }, continent: "Africa", discover: "The Agadez Mosque has stood since 1515 — its 89-foot minaret is the tallest mud-brick structure in the world" },
-  "566": { name: "Nigeria", sticker: { icon: "🎭", title: "Nollywood", desc: "Stories without limits" }, continent: "Africa", discover: "Nollywood produces more films per year than Hollywood — Africa's cultural powerhouse" },
-  "408": { name: "North Korea", sticker: { icon: "🏛️", title: "Hermit Kingdom", desc: "The world's most isolated nation" }, continent: "Asia", discover: "One of the least-visited countries on Earth — fewer than 5,000 Western tourists per year" },
-  "807": { name: "North Macedonia", sticker: { icon: "☀️", title: "Ohrid", desc: "Lake older than civilization" }, continent: "Europe", discover: "Lake Ohrid is one of the oldest and deepest lakes in Europe — over 3 million years old" },
-  "578": { name: "Norway", sticker: { icon: "🌊", title: "Fjord Walker", desc: "Carved by glaciers" }, continent: "Europe", discover: "Has the world's longest road tunnel — 15 miles through a mountain" },
-  "512": { name: "Oman", sticker: { icon: "⛵", title: "Frankincense Trail", desc: "The scent that built empires" }, continent: "Asia", discover: "Was the world's primary source of frankincense — more valuable than gold in the ancient world" },
-  "586": { name: "Pakistan", sticker: { icon: "⛰️", title: "Karakoram", desc: "The most dangerous beautiful road" }, continent: "Asia", discover: "The Karakoram Highway is the world's highest paved road — crossing glaciers at 15,000 feet" },
-  "275": { name: "Palestine", sticker: { icon: "🫒", title: "Olive Groves", desc: "Roots deeper than borders" }, continent: "Asia", discover: "Contains some of the oldest olive trees on Earth — some are estimated at 4,000+ years old" },
-  "591": { name: "Panama", sticker: { icon: "🚢", title: "The Canal", desc: "Where oceans meet" }, continent: "North America", discover: "The Panama Canal saves ships a 12,000-mile trip around South America" },
-  "598": { name: "Papua New Guinea", sticker: { icon: "🦜", title: "Thousand Tongues", desc: "Most languages on Earth" }, continent: "Oceania", discover: "Over 800 languages are spoken here — the most linguistically diverse place on Earth" },
-  "600": { name: "Paraguay", sticker: { icon: "🌿", title: "Guaraní Heart", desc: "Indigenous language spoken by all" }, continent: "South America", discover: "One of the only countries where an indigenous language (Guaraní) is spoken by the majority" },
-  "604": { name: "Peru", sticker: { icon: "🏔️", title: "Camino Inca", desc: "Above the clouds" }, continent: "South America", discover: "Machu Picchu was built entirely without mortar — the stones fit together with surgical precision" },
-  "608": { name: "Philippines", sticker: { icon: "🏝️", title: "7,641 Islands", desc: "Smiles across the Pacific" }, continent: "Asia", discover: "Has 7,641 islands — but only about 2,000 are inhabited. Many have never been named" },
-  "616": { name: "Poland", sticker: { icon: "🏰", title: "Resilient Spirit", desc: "Rebuilt from rubble" }, continent: "Europe", discover: "Warsaw's Old Town was 85% destroyed in WWII — then rebuilt brick by brick from paintings and photos" },
-  "620": { name: "Portugal", sticker: { icon: "⚓", title: "Saudade", desc: "Beautiful longing" }, continent: "Europe", discover: "Livraria Lello bookstore inspired the Hogwarts staircase — it's been open since 1906" },
-  "634": { name: "Qatar", sticker: { icon: "✨", title: "Desert Pearl", desc: "Wealth rising from sand" }, continent: "Asia", discover: "Has the third-largest natural gas reserves on Earth and the highest GDP per capita" },
-  "642": { name: "Romania", sticker: { icon: "🧛", title: "Transylvania", desc: "Dracula's castle in the Carpathians" }, continent: "Europe", discover: "Bran Castle is associated with the Dracula legend — Vlad the Impaler was a real 15th-century prince" },
-  "643": { name: "Russia", sticker: { icon: "❄️", title: "Eleven Time Zones", desc: "Spanning a continent and a half" }, continent: "Asia", discover: "Lake Baikal holds 20% of the world's unfrozen fresh water — it's the oldest and deepest lake on Earth" },
-  "646": { name: "Rwanda", sticker: { icon: "🦍", title: "Land of a Thousand Hills", desc: "Gorillas in the mist" }, continent: "Africa", discover: "Kigali is now one of the cleanest cities in Africa — plastic bags have been banned since 2008" },
-  "682": { name: "Saudi Arabia", sticker: { icon: "🕌", title: "Two Holy Cities", desc: "Where millions make pilgrimage" }, continent: "Asia", discover: "Mecca draws over 2 million pilgrims during Hajj — the largest annual gathering on Earth" },
-  "686": { name: "Senegal", sticker: { icon: "🥁", title: "Teranga", desc: "Hospitality as a way of life" }, continent: "Africa", discover: "The concept of 'Teranga' (radical hospitality) is so central that it's basically a national philosophy" },
-  "688": { name: "Serbia", sticker: { icon: "🏰", title: "Danube Fortress", desc: "Balkan crossroads" }, continent: "Europe", discover: "Belgrade's Kalemegdan fortress has been destroyed and rebuilt over 115 times in history" },
-  "694": { name: "Sierra Leone", sticker: { icon: "🏖️", title: "Lion Mountains", desc: "Where freed people built a home" }, continent: "Africa", discover: "Freetown was founded as a settlement for freed slaves — its name is literally 'Free Town'" },
-  "703": { name: "Slovakia", sticker: { icon: "🏔️", title: "Tatra Heights", desc: "Smallest alpine range in the world" }, continent: "Europe", discover: "The High Tatras are called 'the smallest big mountains in the world' — stunning alpine scenery in miniature" },
-  "705": { name: "Slovenia", sticker: { icon: "🌲", title: "Green Gem", desc: "Europe's most forested secret" }, continent: "Europe", discover: "Over 60% forest-covered and home to the magical Lake Bled with its island church" },
-  "706": { name: "Somalia", sticker: { icon: "🐪", title: "Horn of Africa", desc: "Ancient trade routes along the coast" }, continent: "Africa", discover: "Has the longest coastline in mainland Africa — over 3,000 kilometers of Indian Ocean shore" },
-  "710": { name: "South Africa", sticker: { icon: "🌍", title: "Rainbow Nation", desc: "Two oceans meet" }, continent: "Africa", discover: "The only country with three capital cities — Pretoria, Cape Town, and Bloemfontein" },
-  "410": { name: "South Korea", sticker: { icon: "🎵", title: "Hallyu", desc: "The wave" }, continent: "Asia", discover: "Seoul's subway has heated seats, library stations, and free WiFi on every train" },
-  "728": { name: "South Sudan", sticker: { icon: "🌍", title: "Newest Nation", desc: "Born in 2011" }, continent: "Africa", discover: "The world's youngest country — gained independence on July 9, 2011" },
-  "724": { name: "Spain", sticker: { icon: "🌅", title: "Duende", desc: "The spirit that moves you" }, continent: "Europe", discover: "La Tomatina festival uses 150,000 tomatoes in a single hour every August" },
-  "144": { name: "Sri Lanka", sticker: { icon: "🍵", title: "Teardrop Island", desc: "Mountain tea in the clouds" }, continent: "Asia", discover: "Sri Lanka's hill-country tea plantations produce some of the world's finest Ceylon tea" },
-  "729": { name: "Sudan", sticker: { icon: "🏛️", title: "Nubian Pyramids", desc: "More pyramids than Egypt" }, continent: "Africa", discover: "Has over 200 pyramids — more than Egypt — remnants of the powerful ancient Nubian kingdoms" },
-  "740": { name: "Suriname", sticker: { icon: "🌴", title: "Jungle Nation", desc: "South America's Dutch-speaking secret" }, continent: "South America", discover: "93% covered in tropical rainforest — one of the most forested countries on Earth" },
-  "752": { name: "Sweden", sticker: { icon: "🌌", title: "Midnight Sun", desc: "Where the sun never sets in summer" }, continent: "Europe", discover: "In the far north, the sun doesn't set for months — then doesn't rise for months in winter" },
-  "756": { name: "Switzerland", sticker: { icon: "⛰️", title: "Alpine", desc: "Precision meets beauty" }, continent: "Europe", discover: "Has enough nuclear shelters to fit 114% of its entire population underground" },
-  "760": { name: "Syria", sticker: { icon: "🏛️", title: "Oldest Capital", desc: "Damascus — 11,000 years inhabited" }, continent: "Asia", discover: "Damascus is widely considered the oldest continuously inhabited city on Earth" },
-  "158": { name: "Taiwan", sticker: { icon: "🏯", title: "Jade Island", desc: "Where tradition meets the future" }, continent: "Asia", discover: "Makes over 60% of the world's semiconductors — the hidden engine of modern technology" },
-  "762": { name: "Tajikistan", sticker: { icon: "⛰️", title: "Pamir Roof", desc: "The roof of the world" }, continent: "Asia", discover: "93% mountainous — the Pamir Highway is one of the highest and most remote roads on Earth" },
-  "834": { name: "Tanzania", sticker: { icon: "🗻", title: "Kilimanjaro", desc: "Touched the sky" }, continent: "Africa", discover: "Kilimanjaro is the tallest freestanding mountain on Earth — rising straight from the plains" },
-  "764": { name: "Thailand", sticker: { icon: "🪷", title: "Land of Smiles", desc: "Never colonized, always free" }, continent: "Asia", discover: "The only Southeast Asian country never colonized by a European power" },
-  "626": { name: "Timor-Leste", sticker: { icon: "🏝️", title: "Crocodile Island", desc: "Legend says the island IS a crocodile" }, continent: "Asia", discover: "Local legend says the island was formed from a crocodile who turned to stone out of gratitude" },
-  "768": { name: "Togo", sticker: { icon: "🌴", title: "Narrow Gem", desc: "West Africa's slender gateway" }, continent: "Africa", discover: "Only 115 km at its widest — one of the narrowest countries in the world" },
-  "780": { name: "Trinidad and Tobago", sticker: { icon: "🎉", title: "Steel Pan", desc: "Invented an instrument from oil drums" }, continent: "North America", discover: "The steel pan is the only acoustic instrument invented in the 20th century — born here" },
-  "788": { name: "Tunisia", sticker: { icon: "🏛️", title: "Carthage", desc: "Rome's greatest rival" }, continent: "Africa", discover: "The ruins of Carthage — once the most powerful city in the Mediterranean — are still here" },
-  "792": { name: "Turkey", sticker: { icon: "🧿", title: "Nazar", desc: "Where East meets West" }, continent: "Asia", discover: "Istanbul is the only city on Earth that sits on two continents" },
-  "795": { name: "Turkmenistan", sticker: { icon: "🔥", title: "Door to Hell", desc: "A crater that's burned since 1971" }, continent: "Asia", discover: "The Darvaza gas crater has been burning continuously since 1971 — a literal door to hell" },
-  "784": { name: "UAE", sticker: { icon: "✨", title: "Desert Mirage", desc: "Future in the sand" }, continent: "Asia", discover: "The Burj Khalifa is taller than two Eiffel Towers stacked on top of each other" },
-  "800": { name: "Uganda", sticker: { icon: "🦍", title: "Pearl of Africa", desc: "Churchill named it that" }, continent: "Africa", discover: "Winston Churchill called it 'The Pearl of Africa' — home to half the world's mountain gorillas" },
-  "804": { name: "Ukraine", sticker: { icon: "🌻", title: "Sunflower Fields", desc: "Golden fields to the horizon" }, continent: "Europe", discover: "One of the world's largest producers of sunflower oil — fields stretch endlessly in summer" },
-  "826": { name: "United Kingdom", sticker: { icon: "👑", title: "The Crown", desc: "History at every corner" }, continent: "Europe", discover: "Big Ben is actually the name of the bell, not the tower — a fact most Londoners get wrong" },
-  "840": { name: "United States", sticker: { icon: "🦅", title: "The American Road", desc: "From sea to shining sea" }, continent: "North America", discover: "Has 63 national parks spanning every climate zone — from Arctic tundra to tropical reef" },
-  "858": { name: "Uruguay", sticker: { icon: "🧉", title: "Mate Republic", desc: "Everyone carries a thermos" }, continent: "South America", discover: "Virtually everyone walks around with a mate gourd and thermos — it's a national lifestyle" },
-  "860": { name: "Uzbekistan", sticker: { icon: "🕌", title: "Silk Road Jewel", desc: "Samarkand's turquoise domes" }, continent: "Asia", discover: "Samarkand's Registan Square is one of the most photographed places on the Silk Road" },
-  "862": { name: "Venezuela", sticker: { icon: "💧", title: "Angel Falls", desc: "World's highest waterfall" }, continent: "South America", discover: "Angel Falls drops 979 meters — so tall that water turns to mist before reaching the bottom" },
-  "704": { name: "Vietnam", sticker: { icon: "🏍️", title: "Xe Ôm", desc: "Life on two wheels" }, continent: "Asia", discover: "Ha Long Bay has nearly 2,000 limestone karst islands rising from emerald water" },
-  "887": { name: "Yemen", sticker: { icon: "🏰", title: "Skyscraper City", desc: "Ancient Manhattan in the desert" }, continent: "Asia", discover: "Shibam has 500-year-old mud-brick towers up to 11 stories — called the 'Manhattan of the Desert'" },
-  "894": { name: "Zambia", sticker: { icon: "💧", title: "Victoria Falls", desc: "The smoke that thunders" }, continent: "Africa", discover: "Victoria Falls is 1.7 km wide — locals call it Mosi-oa-Tunya, 'The Smoke That Thunders'" },
-  "716": { name: "Zimbabwe", sticker: { icon: "🏛️", title: "Great Zimbabwe", desc: "Medieval stone city of mystery" }, continent: "Africa", discover: "Great Zimbabwe's walls were built without mortar — the stones are so precise they still stand" },
+  "004": { name: "Afghanistan", sticker: { icon: "ðï¸", title: "Hindu Kush", desc: "Where empires came to rest" }, continent: "Asia", discover: "The Hindu Kush mountains hold passes that connected ancient civilizations for millennia" },
+  "008": { name: "Albania", sticker: { icon: "ð¦", title: "Eagle's Nest", desc: "Balkan sanctuary of wild shores" }, continent: "Europe", discover: "Has over 750,000 concrete bunkers â more per capita than any country on Earth" },
+  "012": { name: "Algeria", sticker: { icon: "ðï¸", title: "Saharan Gate", desc: "Africa's vast golden threshold" }, continent: "Africa", discover: "The largest country in Africa â 80% of its territory is Sahara Desert" },
+  "024": { name: "Angola", sticker: { icon: "ð", title: "Diamond Coast", desc: "Riches beneath red earth" }, continent: "Africa", discover: "The Kalandula Falls are among the largest waterfalls in Africa by volume" },
+  "032": { name: "Argentina", sticker: { icon: "ð¥©", title: "Fin del Mundo", desc: "Edge of the earth" }, continent: "South America", discover: "Ushuaia is the southernmost city in the world â the gateway to Antarctica" },
+  "031": { name: "Azerbaijan", sticker: { icon: "ð¥", title: "Eternal Flames", desc: "Land of fire since antiquity" }, continent: "Asia", discover: "Natural gas fires have burned continuously on its hillsides for thousands of years" },
+  "036": { name: "Australia", sticker: { icon: "ðª", title: "Outback", desc: "Oldest living culture on Earth" }, continent: "Oceania", discover: "Aboriginal Australians are the world's oldest continuous civilization â 65,000+ years" },
+  "040": { name: "Austria", sticker: { icon: "ð¼", title: "Alpine Symphony", desc: "Where classical music was born" }, continent: "Europe", discover: "Vienna has produced more famous composers than any other city in history" },
+  "051": { name: "Armenia", sticker: { icon: "âï¸", title: "First Christian Nation", desc: "Faith carved in ancient stone" }, continent: "Asia", discover: "Became the first country to adopt Christianity as its state religion in 301 AD" },
+  "044": { name: "Bahamas", sticker: { icon: "ðï¸", title: "Azure Shallows", desc: "Turquoise waters of eternal summer" }, continent: "North America", discover: "Has over 700 islands but only 30 are inhabited â the rest are pristine wilderness" },
+  "050": { name: "Bangladesh", sticker: { icon: "ð¾", title: "Delta of Life", desc: "Where rivers braid into the sea" }, continent: "Asia", discover: "The Sundarbans mangrove forest is the largest in the world and home to Bengal tigers" },
+  "112": { name: "Belarus", sticker: { icon: "ð²", title: "Primeval Forest", desc: "Europe's last untouched wilderness" }, continent: "Europe", discover: "The BiaÅowieÅ¼a Forest is one of Europe's last primeval forests â home to wild European bison" },
+  "056": { name: "Belgium", sticker: { icon: "ð«", title: "Chocolate Kingdom", desc: "Sweet craft perfected over centuries" }, continent: "Europe", discover: "Brussels Airport is the world's largest chocolate seller â 800 tons per year" },
+  "084": { name: "Belize", sticker: { icon: "ð", title: "Jaguar's Domain", desc: "Jungle hides ancient Maya secrets" }, continent: "North America", discover: "The Great Blue Hole is a massive underwater sinkhole visible from space" },
+  "204": { name: "Benin", sticker: { icon: "ð¥", title: "Voodoo Roots", desc: "Where spiritual traditions were born" }, continent: "Africa", discover: "The birthplace of Voodoo â practiced here as an official religion by millions" },
+  "064": { name: "Bhutan", sticker: { icon: "ð", title: "Thunder Dragon", desc: "Happiness measured, not GDP" }, continent: "Asia", discover: "The only country that measures Gross National Happiness instead of GDP" },
+  "068": { name: "Bolivia", sticker: { icon: "â°ï¸", title: "Salt Mirror", desc: "Sky reflected in endless white" }, continent: "South America", discover: "Salar de Uyuni is the world's largest salt flat â it becomes a perfect mirror when wet" },
+  "070": { name: "Bosnia and Herzegovina", sticker: { icon: "ð", title: "Stari Most", desc: "A bridge rebuilt from memory" }, continent: "Europe", discover: "The Stari Most bridge was destroyed in 1993, then rebuilt stone by stone from the riverbed" },
+  "072": { name: "Botswana", sticker: { icon: "ð", title: "Okavango", desc: "A river that never reaches the sea" }, continent: "Africa", discover: "The Okavango Delta is the world's largest inland delta â it floods in the desert" },
+  "076": { name: "Brazil", sticker: { icon: "ð", title: "Alma Carioca", desc: "Rhythm runs deep" }, continent: "South America", discover: "The Amazon produces 20% of the world's oxygen and holds 10% of all species on Earth" },
+  "096": { name: "Brunei", sticker: { icon: "ð", title: "Golden Sultanate", desc: "Oil-rich jewel of Borneo" }, continent: "Asia", discover: "One of the world's wealthiest nations per capita â no income tax for citizens" },
+  "100": { name: "Bulgaria", sticker: { icon: "ð¹", title: "Rose Valley", desc: "Fragrance bottled for the world" }, continent: "Europe", discover: "Produces 70% of the world's rose oil â concentrated in the Valley of Roses" },
+  "854": { name: "Burkina Faso", sticker: { icon: "ð­", title: "Land of the Upright", desc: "Integrity woven into the name" }, continent: "Africa", discover: "Hosts FESPACO, Africa's largest and oldest film festival, drawing filmmakers from across the continent" },
+  "108": { name: "Burundi", sticker: { icon: "ð¥", title: "Drum Heart", desc: "Rhythm from the Great Lakes" }, continent: "Africa", discover: "The Royal Drummers of Burundi have performed their sacred rhythms for over 400 years" },
+  "116": { name: "Cambodia", sticker: { icon: "ðï¸", title: "Angkor", desc: "Temples reclaimed by the jungle" }, continent: "Asia", discover: "Angkor Wat is the largest religious monument ever built â visible from space" },
+  "120": { name: "Cameroon", sticker: { icon: "ð", title: "Africa in Miniature", desc: "Every African landscape in one country" }, continent: "Africa", discover: "Called 'Africa in Miniature' because it contains every major climate and landscape found on the continent" },
+  "124": { name: "Canada", sticker: { icon: "ð", title: "True North", desc: "Wild and boundless" }, continent: "North America", discover: "Has more lakes than all other countries on Earth combined" },
+  "140": { name: "Central African Republic", sticker: { icon: "ð¿", title: "Green Heart", desc: "Equatorial forest holds ancient secrets" }, continent: "Africa", discover: "The Dzanga-Sangha Reserve is one of the last places on Earth to see forest elephants in the wild" },
+  "148": { name: "Chad", sticker: { icon: "ðª", title: "Saharan Crossroads", desc: "Where desert meets savanna" }, continent: "Africa", discover: "Lake Chad has shrunk by 90% in 50 years â one of the world's worst ecological disasters" },
+  "152": { name: "Chile", sticker: { icon: "ð", title: "Tierra del Fuego", desc: "Land of fire" }, continent: "South America", discover: "The Atacama Desert is the driest place on Earth â some spots haven't seen rain in recorded history" },
+  "156": { name: "China", sticker: { icon: "ð", title: "Middle Kingdom", desc: "5,000 years deep" }, continent: "Asia", discover: "The Great Wall spans over 13,000 miles â it's not one wall but many, built over centuries" },
+  "170": { name: "Colombia", sticker: { icon: "ð", title: "El Dorado", desc: "The golden one" }, continent: "South America", discover: "Has more bird species than any country on Earth â over 1,900 documented species" },
+  "180": { name: "Congo (DRC)", sticker: { icon: "ð", title: "Mighty River", desc: "The deepest river on Earth" }, continent: "Africa", discover: "The Congo River is the world's deepest river â over 720 feet in places" },
+  "178": { name: "Congo (Republic)", sticker: { icon: "ð´", title: "Equatorial Green", desc: "Rainforest absorbs the world's carbon" }, continent: "Africa", discover: "Over 70% forested â one of the few countries on Earth with negative carbon emissions" },
+  "188": { name: "Costa Rica", sticker: { icon: "ð¦", title: "Pura Vida", desc: "Pure life, no army needed" }, continent: "North America", discover: "Abolished its military in 1948 and spends the money on education and nature instead" },
+  "191": { name: "Croatia", sticker: { icon: "ðï¸", title: "Adriatic Jewel", desc: "A thousand islands in crystal water" }, continent: "Europe", discover: "Has over 1,200 islands â Dubrovnik's Old Town doubled as King's Landing in Game of Thrones" },
+  "192": { name: "Cuba", sticker: { icon: "ð", title: "Frozen in Time", desc: "Vintage chrome on Caribbean streets" }, continent: "North America", discover: "Has more 1950s American cars still running than anywhere else on Earth" },
+  "196": { name: "Cyprus", sticker: { icon: "ð", title: "Aphrodite's Shore", desc: "Where the goddess was born" }, continent: "Europe", discover: "Legend says Aphrodite rose from the sea foam near Paphos â you can visit the exact rock" },
+  "203": { name: "Czech Republic", sticker: { icon: "ðº", title: "Bohemian Dream", desc: "More beer per person than anywhere" }, continent: "Europe", discover: "Has the highest beer consumption per capita in the world â Pilsner was invented here" },
+  "208": { name: "Denmark", sticker: { icon: "ð´", title: "Hygge", desc: "The art of cozy contentment" }, continent: "Europe", discover: "Copenhagen has more bikes than people and was rated the world's happiest city" },
+  "262": { name: "Djibouti", sticker: { icon: "â", title: "Red Sea Gate", desc: "Strategic crossroads of continents" }, continent: "Africa", discover: "Lake Assal is the lowest point in Africa and one of the saltiest bodies of water on Earth" },
+  "214": { name: "Dominican Republic", sticker: { icon: "ðï¸", title: "Merengue Shore", desc: "Rhythm meets white sand" }, continent: "North America", discover: "Santo Domingo was the first European settlement in the Americas â founded in 1496" },
+  "218": { name: "Ecuador", sticker: { icon: "ð¢", title: "GalÃ¡pagos", desc: "Where Darwin saw evolution" }, continent: "South America", discover: "The GalÃ¡pagos Islands inspired Darwin's theory of evolution â each island has unique species" },
+  "818": { name: "Egypt", sticker: { icon: "ðº", title: "Eternal", desc: "Monuments to forever" }, continent: "Africa", discover: "The Great Pyramid was the tallest structure on Earth for 3,800 years straight" },
+  "222": { name: "El Salvador", sticker: { icon: "ð", title: "Land of Volcanoes", desc: "Fire shapes the smallest Central American nation" }, continent: "North America", discover: "Has 23 active volcanoes and was the first country to adopt Bitcoin as legal tender" },
+  "226": { name: "Equatorial Guinea", sticker: { icon: "ð¿", title: "Bioko Island", desc: "Volcanic island in the Gulf of Guinea" }, continent: "Africa", discover: "The only African country where Spanish is the primary official language" },
+  "232": { name: "Eritrea", sticker: { icon: "ð", title: "Red Sea Nation", desc: "Italian-built railway climbs the escarpment" }, continent: "Africa", discover: "Asmara's Art Deco architecture earned it UNESCO World Heritage status" },
+  "233": { name: "Estonia", sticker: { icon: "ð»", title: "Digital Republic", desc: "The world's most wired nation" }, continent: "Europe", discover: "Skype was invented here â Estonia was the first country to offer e-residency to anyone on Earth" },
+  "748": { name: "Eswatini", sticker: { icon: "ð", title: "Reed Dance", desc: "Africa's last absolute monarchy" }, continent: "Africa", discover: "The annual Reed Dance ceremony brings together over 40,000 young women in cultural celebration" },
+  "231": { name: "Ethiopia", sticker: { icon: "â", title: "Coffee's Birthplace", desc: "Where a goat herder changed the world" }, continent: "Africa", discover: "The birthplace of coffee â and the only African country never colonized by a European power" },
+  "242": { name: "Fiji", sticker: { icon: "ðº", title: "Coral Kingdom", desc: "333 islands in the South Pacific" }, continent: "Oceania", discover: "One of the first places on Earth to see each new day â right near the International Date Line" },
+  "246": { name: "Finland", sticker: { icon: "ð", title: "Northern Lights", desc: "Aurora dances above frozen lakes" }, continent: "Europe", discover: "Has more saunas than cars â 3.3 million saunas for 5.5 million people" },
+  "250": { name: "France", sticker: { icon: "ð¥", title: "L'Art de Vivre", desc: "The art of living" }, continent: "Europe", discover: "The most visited country on Earth â 89 million tourists per year choose France" },
+  "266": { name: "Gabon", sticker: { icon: "ð¦", title: "Gorilla Sanctuary", desc: "Rainforest protects gentle giants" }, continent: "Africa", discover: "Over 85% forested â one of the last strongholds of western lowland gorillas" },
+  "270": { name: "Gambia", sticker: { icon: "ð¦", title: "River Nation", desc: "Africa's smallest mainland country" }, continent: "Africa", discover: "Entirely surrounds the Gambia River and is completely enclosed by Senegal on three sides" },
+  "268": { name: "Georgia", sticker: { icon: "ð·", title: "Wine Cradle", desc: "8,000 years of winemaking" }, continent: "Asia", discover: "Archaeological evidence shows wine was first made here 8,000 years ago â the oldest in the world" },
+  "276": { name: "Germany", sticker: { icon: "ð°", title: "Wanderlust", desc: "They invented the word" }, continent: "Europe", discover: "Has over 25,000 castles â more than any other country in Europe" },
+  "288": { name: "Ghana", sticker: { icon: "ð¥", title: "Gold Coast", desc: "First free nation south of the Sahara" }, continent: "Africa", discover: "Was the first sub-Saharan African country to gain independence in 1957" },
+  "300": { name: "Greece", sticker: { icon: "ðï¸", title: "Birthplace", desc: "Where it all began" }, continent: "Europe", discover: "The first Olympic Games were held here in 776 BC â nearly 3,000 years ago" },
+  "320": { name: "Guatemala", sticker: { icon: "ð½", title: "Maya Heartland", desc: "Pyramids older than you'd think" }, continent: "North America", discover: "Tikal's pyramids rise above the jungle canopy â some are taller than a 20-story building" },
+  "324": { name: "Guinea", sticker: { icon: "ð§", title: "Water Tower", desc: "Source of West Africa's great rivers" }, continent: "Africa", discover: "Called the 'Water Tower of West Africa' â the Niger, Senegal, and Gambia rivers all start here" },
+  "624": { name: "Guinea-Bissau", sticker: { icon: "ð¢", title: "BijagÃ³s Islands", desc: "An archipelago time forgot" }, continent: "Africa", discover: "The BijagÃ³s Archipelago is one of the last pristine island ecosystems in the world" },
+  "328": { name: "Guyana", sticker: { icon: "ð¿", title: "El Dorado's Land", desc: "Rainforest hides golden legends" }, continent: "South America", discover: "Kaieteur Falls is four times taller than Niagara â one of the world's most powerful waterfalls" },
+  "332": { name: "Haiti", sticker: { icon: "ðï¸", title: "First Free", desc: "The first Black republic" }, continent: "North America", discover: "The first successful slave revolution in history â gained independence from France in 1804" },
+  "340": { name: "Honduras", sticker: { icon: "ð ", title: "Bay Islands", desc: "Caribbean reef diving paradise" }, continent: "North America", discover: "The Bay Islands sit on the Mesoamerican Barrier Reef â second-largest coral system on Earth" },
+  "348": { name: "Hungary", sticker: { icon: "â¨ï¸", title: "Thermal Baths", desc: "Budapest floats on hot springs" }, continent: "Europe", discover: "Budapest has more thermal springs than any capital city â some baths are 500 years old" },
+  "352": { name: "Iceland", sticker: { icon: "âï¸", title: "Fire & Ice", desc: "Edge of the known world" }, continent: "Europe", discover: "You can see two tectonic plates meeting with your own eyes in Ãingvellir" },
+  "356": { name: "India", sticker: { icon: "ðª", title: "A Million Colors", desc: "Sensory overload in the best way" }, continent: "Asia", discover: "Kumbh Mela draws 150 million people â the largest peaceful gathering in human history" },
+  "360": { name: "Indonesia", sticker: { icon: "ðº", title: "Nusantara", desc: "17,000 islands" }, continent: "Asia", discover: "The largest archipelago on Earth â spread across 17,508 islands and three time zones" },
+  "364": { name: "Iran", sticker: { icon: "ð¹", title: "Persia", desc: "Empires and poetry" }, continent: "Asia", discover: "Persepolis was the ceremonial capital of one of the largest empires in ancient history" },
+  "368": { name: "Iraq", sticker: { icon: "ðï¸", title: "Cradle of Writing", desc: "Where humanity first wrote things down" }, continent: "Asia", discover: "The Sumerians invented writing here around 3400 BC â the oldest known script on Earth" },
+  "372": { name: "Ireland", sticker: { icon: "ð", title: "Emerald Isle", desc: "40 shades of green" }, continent: "Europe", discover: "Has more sheep than people and produced four Nobel Literature laureates from a tiny population" },
+  "376": { name: "Israel", sticker: { icon: "ð", title: "Promised Land", desc: "Three faiths, one ancient city" }, continent: "Asia", discover: "The Dead Sea is the lowest point on Earth's surface â you float without trying" },
+  "380": { name: "Italy", sticker: { icon: "ð·", title: "La Dolce Vita", desc: "The sweet life" }, continent: "Europe", discover: "Has more UNESCO World Heritage sites than any nation on Earth â 58 and counting" },
+  "384": { name: "Ivory Coast", sticker: { icon: "ð«", title: "Cocoa Empire", desc: "Chocolate's secret source" }, continent: "Africa", discover: "Produces 30% of the world's cocoa â more than any other country" },
+  "388": { name: "Jamaica", sticker: { icon: "ð¶", title: "Reggae Nation", desc: "One island changed world music" }, continent: "North America", discover: "Bob Marley's music made this tiny island one of the most culturally influential nations on Earth" },
+  "392": { name: "Japan", sticker: { icon: "â©ï¸", title: "Wabi-Sabi", desc: "Beauty in imperfection" }, continent: "Asia", discover: "Has over 6,800 islands and more vending machines per capita than anywhere else" },
+  "400": { name: "Jordan", sticker: { icon: "ðï¸", title: "Rose City", desc: "Carved entirely from pink stone" }, continent: "Asia", discover: "Petra was carved directly into rose-red cliff faces over 2,000 years ago" },
+  "398": { name: "Kazakhstan", sticker: { icon: "ð´", title: "Steppe Riders", desc: "Endless grasslands under infinite sky" }, continent: "Asia", discover: "The world's largest landlocked country â bigger than all of Western Europe combined" },
+  "404": { name: "Kenya", sticker: { icon: "ð", title: "The Migration", desc: "Life in motion" }, continent: "Africa", discover: "The Great Migration moves 2 million wildebeest across the Serengeti every year" },
+  "414": { name: "Kuwait", sticker: { icon: "ð¢ï¸", title: "Oil Oasis", desc: "Desert wealth" }, continent: "Asia", discover: "Has approximately 7% of the world's known oil reserves beneath its small territory" },
+  "417": { name: "Kyrgyzstan", sticker: { icon: "â°ï¸", title: "Celestial Mountains", desc: "Yurt life above the clouds" }, continent: "Asia", discover: "93% of the country is mountainous â many communities still live as semi-nomadic yurt dwellers" },
+  "418": { name: "Laos", sticker: { icon: "ð¯", title: "Million Elephants", desc: "Mekong flows through ancient kingdoms" }, continent: "Asia", discover: "The most heavily bombed country per capita in history, yet radiates peaceful Buddhist culture" },
+  "428": { name: "Latvia", sticker: { icon: "ðµ", title: "Song Festival", desc: "30,000 voices become one" }, continent: "Europe", discover: "The Latvian Song Festival brings 30,000+ singers together â recognized by UNESCO" },
+  "422": { name: "Lebanon", sticker: { icon: "ð²", title: "Cedar Country", desc: "The tree on the flag is 5,000 years old" }, continent: "Asia", discover: "The Cedars of God are among the last remnants of forests that once covered ancient Mesopotamia" },
+  "426": { name: "Lesotho", sticker: { icon: "â°ï¸", title: "Kingdom in the Sky", desc: "The highest low point of any country" }, continent: "Africa", discover: "The only country in the world where every square inch is above 1,000 meters elevation" },
+  "430": { name: "Liberia", sticker: { icon: "ð´", title: "Freedom's Coast", desc: "Founded by freed American slaves" }, continent: "Africa", discover: "Founded in 1822 by freed African Americans â its capital Monrovia is named after James Monroe" },
+  "434": { name: "Libya", sticker: { icon: "ðï¸", title: "Roman Ruins", desc: "Ancient columns still standing in sand" }, continent: "Africa", discover: "Leptis Magna is one of the best-preserved Roman cities anywhere â rivaling Pompeii" },
+  "440": { name: "Lithuania", sticker: { icon: "âï¸", title: "Hill of Crosses", desc: "Thousands of crosses placed by pilgrims" }, continent: "Europe", discover: "The Hill of Crosses has over 100,000 crosses â torn down by Soviets, rebuilt each time by locals" },
+  "442": { name: "Luxembourg", sticker: { icon: "ð°", title: "Tiny Powerhouse", desc: "Europe's wealthiest per person" }, continent: "Europe", discover: "Has the highest GDP per capita in the world and more castles per square km than anywhere" },
+  "450": { name: "Madagascar", sticker: { icon: "ð¦", title: "Island Apart", desc: "90% of species found nowhere else" }, continent: "Africa", discover: "Split from India 88 million years ago â its isolation created species that exist nowhere else on Earth" },
+  "454": { name: "Malawi", sticker: { icon: "ð ", title: "Lake of Stars", desc: "More fish species than any lake on Earth" }, continent: "Africa", discover: "Lake Malawi holds more fish species than any other lake â over 1,000, most found nowhere else" },
+  "458": { name: "Malaysia", sticker: { icon: "ðï¸", title: "Twin Towers", desc: "Petronas pierces the tropical sky" }, continent: "Asia", discover: "The Petronas Twin Towers were the world's tallest buildings for six years" },
+  "466": { name: "Mali", sticker: { icon: "ð", title: "Timbuktu", desc: "Legendary city of scholars" }, continent: "Africa", discover: "Timbuktu was one of the world's great centers of learning â its libraries held 700,000 manuscripts" },
+  "478": { name: "Mauritania", sticker: { icon: "ðï¸", title: "Saharan Expanse", desc: "Endless dunes" }, continent: "Africa", discover: "The Richat Structure (Eye of the Sahara) is a 30-mile wide geological formation visible from space" },
+  "484": { name: "Mexico", sticker: { icon: "ð¶ï¸", title: "CorazÃ³n de Fuego", desc: "Heart of fire" }, continent: "North America", discover: "Birthplace of chocolate, chili peppers, and corn â foods that changed the world" },
+  "498": { name: "Moldova", sticker: { icon: "ð·", title: "Underground Cellars", desc: "World's largest wine collection" }, continent: "Europe", discover: "MileÈtii Mici holds the Guinness record for the world's largest wine collection â 2 million bottles" },
+  "496": { name: "Mongolia", sticker: { icon: "ð´", title: "Khan's Steppe", desc: "The largest empire started here" }, continent: "Asia", discover: "Genghis Khan built the largest contiguous land empire in history from these steppes" },
+  "499": { name: "Montenegro", sticker: { icon: "â°ï¸", title: "Black Mountain", desc: "Europe's deepest fjord" }, continent: "Europe", discover: "The Bay of Kotor is Europe's southernmost fjord â surrounded by mountains that plunge into the sea" },
+  "504": { name: "Morocco", sticker: { icon: "ð«", title: "Medina Walker", desc: "Lost in the souk" }, continent: "Africa", discover: "Fez's University of al-Qarawiyyin was founded in 859 AD â the oldest still-operating university on Earth" },
+  "508": { name: "Mozambique", sticker: { icon: "ð", title: "Bazaruto", desc: "Indian Ocean pearl" }, continent: "Africa", discover: "The Bazaruto Archipelago has some of the last remaining dugong populations in East Africa" },
+  "104": { name: "Myanmar", sticker: { icon: "ðï¸", title: "Golden Pagodas", desc: "Shwedagon glows at twilight" }, continent: "Asia", discover: "Bagan has over 2,000 ancient Buddhist temples spread across a single plain" },
+  "516": { name: "Namibia", sticker: { icon: "ðï¸", title: "Skeleton Coast", desc: "Where desert meets the sea" }, continent: "Africa", discover: "The Namib Desert is the oldest desert on Earth â 55 to 80 million years old" },
+  "524": { name: "Nepal", sticker: { icon: "ðï¸", title: "Roof of the World", desc: "Where the sky begins" }, continent: "Asia", discover: "Has 8 of the world's 14 highest peaks, including Everest at 8,849 meters" },
+  "528": { name: "Netherlands", sticker: { icon: "ð·", title: "Below Sea Level", desc: "Built on water" }, continent: "Europe", discover: "A third of the country is below sea level â protected by an engineering marvel of dikes" },
+  "554": { name: "New Zealand", sticker: { icon: "ð¿", title: "Aotearoa", desc: "Land of the long white cloud" }, continent: "Oceania", discover: "Was the last large landmass settled by humans â the MÄori arrived around 1300 AD" },
+  "558": { name: "Nicaragua", sticker: { icon: "ð´", title: "Land of Lakes", desc: "Freshwater sharks in a tropical lake" }, continent: "North America", discover: "Lake Nicaragua is the only freshwater lake on Earth that has bull sharks" },
+  "562": { name: "Niger", sticker: { icon: "ðª", title: "Sahel Gateway", desc: "Where Sahara gives way to green" }, continent: "Africa", discover: "The Agadez Mosque has stood since 1515 â its 89-foot minaret is the tallest mud-brick structure in the world" },
+  "566": { name: "Nigeria", sticker: { icon: "ð­", title: "Nollywood", desc: "Stories without limits" }, continent: "Africa", discover: "Nollywood produces more films per year than Hollywood â Africa's cultural powerhouse" },
+  "408": { name: "North Korea", sticker: { icon: "ðï¸", title: "Hermit Kingdom", desc: "The world's most isolated nation" }, continent: "Asia", discover: "One of the least-visited countries on Earth â fewer than 5,000 Western tourists per year" },
+  "807": { name: "North Macedonia", sticker: { icon: "âï¸", title: "Ohrid", desc: "Lake older than civilization" }, continent: "Europe", discover: "Lake Ohrid is one of the oldest and deepest lakes in Europe â over 3 million years old" },
+  "578": { name: "Norway", sticker: { icon: "ð", title: "Fjord Walker", desc: "Carved by glaciers" }, continent: "Europe", discover: "Has the world's longest road tunnel â 15 miles through a mountain" },
+  "512": { name: "Oman", sticker: { icon: "âµ", title: "Frankincense Trail", desc: "The scent that built empires" }, continent: "Asia", discover: "Was the world's primary source of frankincense â more valuable than gold in the ancient world" },
+  "586": { name: "Pakistan", sticker: { icon: "â°ï¸", title: "Karakoram", desc: "The most dangerous beautiful road" }, continent: "Asia", discover: "The Karakoram Highway is the world's highest paved road â crossing glaciers at 15,000 feet" },
+  "275": { name: "Palestine", sticker: { icon: "ð«", title: "Olive Groves", desc: "Roots deeper than borders" }, continent: "Asia", discover: "Contains some of the oldest olive trees on Earth â some are estimated at 4,000+ years old" },
+  "591": { name: "Panama", sticker: { icon: "ð¢", title: "The Canal", desc: "Where oceans meet" }, continent: "North America", discover: "The Panama Canal saves ships a 12,000-mile trip around South America" },
+  "598": { name: "Papua New Guinea", sticker: { icon: "ð¦", title: "Thousand Tongues", desc: "Most languages on Earth" }, continent: "Oceania", discover: "Over 800 languages are spoken here â the most linguistically diverse place on Earth" },
+  "600": { name: "Paraguay", sticker: { icon: "ð¿", title: "GuaranÃ­ Heart", desc: "Indigenous language spoken by all" }, continent: "South America", discover: "One of the only countries where an indigenous language (GuaranÃ­) is spoken by the majority" },
+  "604": { name: "Peru", sticker: { icon: "ðï¸", title: "Camino Inca", desc: "Above the clouds" }, continent: "South America", discover: "Machu Picchu was built entirely without mortar â the stones fit together with surgical precision" },
+  "608": { name: "Philippines", sticker: { icon: "ðï¸", title: "7,641 Islands", desc: "Smiles across the Pacific" }, continent: "Asia", discover: "Has 7,641 islands â but only about 2,000 are inhabited. Many have never been named" },
+  "616": { name: "Poland", sticker: { icon: "ð°", title: "Resilient Spirit", desc: "Rebuilt from rubble" }, continent: "Europe", discover: "Warsaw's Old Town was 85% destroyed in WWII â then rebuilt brick by brick from paintings and photos" },
+  "620": { name: "Portugal", sticker: { icon: "â", title: "Saudade", desc: "Beautiful longing" }, continent: "Europe", discover: "Livraria Lello bookstore inspired the Hogwarts staircase â it's been open since 1906" },
+  "634": { name: "Qatar", sticker: { icon: "â¨", title: "Desert Pearl", desc: "Wealth rising from sand" }, continent: "Asia", discover: "Has the third-largest natural gas reserves on Earth and the highest GDP per capita" },
+  "642": { name: "Romania", sticker: { icon: "ð§", title: "Transylvania", desc: "Dracula's castle in the Carpathians" }, continent: "Europe", discover: "Bran Castle is associated with the Dracula legend â Vlad the Impaler was a real 15th-century prince" },
+  "643": { name: "Russia", sticker: { icon: "âï¸", title: "Eleven Time Zones", desc: "Spanning a continent and a half" }, continent: "Asia", discover: "Lake Baikal holds 20% of the world's unfrozen fresh water â it's the oldest and deepest lake on Earth" },
+  "646": { name: "Rwanda", sticker: { icon: "ð¦", title: "Land of a Thousand Hills", desc: "Gorillas in the mist" }, continent: "Africa", discover: "Kigali is now one of the cleanest cities in Africa â plastic bags have been banned since 2008" },
+  "682": { name: "Saudi Arabia", sticker: { icon: "ð", title: "Two Holy Cities", desc: "Where millions make pilgrimage" }, continent: "Asia", discover: "Mecca draws over 2 million pilgrims during Hajj â the largest annual gathering on Earth" },
+  "686": { name: "Senegal", sticker: { icon: "ð¥", title: "Teranga", desc: "Hospitality as a way of life" }, continent: "Africa", discover: "The concept of 'Teranga' (radical hospitality) is so central that it's basically a national philosophy" },
+  "688": { name: "Serbia", sticker: { icon: "ð°", title: "Danube Fortress", desc: "Balkan crossroads" }, continent: "Europe", discover: "Belgrade's Kalemegdan fortress has been destroyed and rebuilt over 115 times in history" },
+  "694": { name: "Sierra Leone", sticker: { icon: "ðï¸", title: "Lion Mountains", desc: "Where freed people built a home" }, continent: "Africa", discover: "Freetown was founded as a settlement for freed slaves â its name is literally 'Free Town'" },
+  "703": { name: "Slovakia", sticker: { icon: "ðï¸", title: "Tatra Heights", desc: "Smallest alpine range in the world" }, continent: "Europe", discover: "The High Tatras are called 'the smallest big mountains in the world' â stunning alpine scenery in miniature" },
+  "705": { name: "Slovenia", sticker: { icon: "ð²", title: "Green Gem", desc: "Europe's most forested secret" }, continent: "Europe", discover: "Over 60% forest-covered and home to the magical Lake Bled with its island church" },
+  "706": { name: "Somalia", sticker: { icon: "ðª", title: "Horn of Africa", desc: "Ancient trade routes along the coast" }, continent: "Africa", discover: "Has the longest coastline in mainland Africa â over 3,000 kilometers of Indian Ocean shore" },
+  "710": { name: "South Africa", sticker: { icon: "ð", title: "Rainbow Nation", desc: "Two oceans meet" }, continent: "Africa", discover: "The only country with three capital cities â Pretoria, Cape Town, and Bloemfontein" },
+  "410": { name: "South Korea", sticker: { icon: "ðµ", title: "Hallyu", desc: "The wave" }, continent: "Asia", discover: "Seoul's subway has heated seats, library stations, and free WiFi on every train" },
+  "728": { name: "South Sudan", sticker: { icon: "ð", title: "Newest Nation", desc: "Born in 2011" }, continent: "Africa", discover: "The world's youngest country â gained independence on July 9, 2011" },
+  "724": { name: "Spain", sticker: { icon: "ð", title: "Duende", desc: "The spirit that moves you" }, continent: "Europe", discover: "La Tomatina festival uses 150,000 tomatoes in a single hour every August" },
+  "144": { name: "Sri Lanka", sticker: { icon: "ðµ", title: "Teardrop Island", desc: "Mountain tea in the clouds" }, continent: "Asia", discover: "Sri Lanka's hill-country tea plantations produce some of the world's finest Ceylon tea" },
+  "729": { name: "Sudan", sticker: { icon: "ðï¸", title: "Nubian Pyramids", desc: "More pyramids than Egypt" }, continent: "Africa", discover: "Has over 200 pyramids â more than Egypt â remnants of the powerful ancient Nubian kingdoms" },
+  "740": { name: "Suriname", sticker: { icon: "ð´", title: "Jungle Nation", desc: "South America's Dutch-speaking secret" }, continent: "South America", discover: "93% covered in tropical rainforest â one of the most forested countries on Earth" },
+  "752": { name: "Sweden", sticker: { icon: "ð", title: "Midnight Sun", desc: "Where the sun never sets in summer" }, continent: "Europe", discover: "In the far north, the sun doesn't set for months â then doesn't rise for months in winter" },
+  "756": { name: "Switzerland", sticker: { icon: "â°ï¸", title: "Alpine", desc: "Precision meets beauty" }, continent: "Europe", discover: "Has enough nuclear shelters to fit 114% of its entire population underground" },
+  "760": { name: "Syria", sticker: { icon: "ðï¸", title: "Oldest Capital", desc: "Damascus â 11,000 years inhabited" }, continent: "Asia", discover: "Damascus is widely considered the oldest continuously inhabited city on Earth" },
+  "158": { name: "Taiwan", sticker: { icon: "ð¯", title: "Jade Island", desc: "Where tradition meets the future" }, continent: "Asia", discover: "Makes over 60% of the world's semiconductors â the hidden engine of modern technology" },
+  "762": { name: "Tajikistan", sticker: { icon: "â°ï¸", title: "Pamir Roof", desc: "The roof of the world" }, continent: "Asia", discover: "93% mountainous â the Pamir Highway is one of the highest and most remote roads on Earth" },
+  "834": { name: "Tanzania", sticker: { icon: "ð»", title: "Kilimanjaro", desc: "Touched the sky" }, continent: "Africa", discover: "Kilimanjaro is the tallest freestanding mountain on Earth â rising straight from the plains" },
+  "764": { name: "Thailand", sticker: { icon: "ðª·", title: "Land of Smiles", desc: "Never colonized, always free" }, continent: "Asia", discover: "The only Southeast Asian country never colonized by a European power" },
+  "626": { name: "Timor-Leste", sticker: { icon: "ðï¸", title: "Crocodile Island", desc: "Legend says the island IS a crocodile" }, continent: "Asia", discover: "Local legend says the island was formed from a crocodile who turned to stone out of gratitude" },
+  "768": { name: "Togo", sticker: { icon: "ð´", title: "Narrow Gem", desc: "West Africa's slender gateway" }, continent: "Africa", discover: "Only 115 km at its widest â one of the narrowest countries in the world" },
+  "780": { name: "Trinidad and Tobago", sticker: { icon: "ð", title: "Steel Pan", desc: "Invented an instrument from oil drums" }, continent: "North America", discover: "The steel pan is the only acoustic instrument invented in the 20th century â born here" },
+  "788": { name: "Tunisia", sticker: { icon: "ðï¸", title: "Carthage", desc: "Rome's greatest rival" }, continent: "Africa", discover: "The ruins of Carthage â once the most powerful city in the Mediterranean â are still here" },
+  "792": { name: "Turkey", sticker: { icon: "ð§¿", title: "Nazar", desc: "Where East meets West" }, continent: "Asia", discover: "Istanbul is the only city on Earth that sits on two continents" },
+  "795": { name: "Turkmenistan", sticker: { icon: "ð¥", title: "Door to Hell", desc: "A crater that's burned since 1971" }, continent: "Asia", discover: "The Darvaza gas crater has been burning continuously since 1971 â a literal door to hell" },
+  "784": { name: "UAE", sticker: { icon: "â¨", title: "Desert Mirage", desc: "Future in the sand" }, continent: "Asia", discover: "The Burj Khalifa is taller than two Eiffel Towers stacked on top of each other" },
+  "800": { name: "Uganda", sticker: { icon: "ð¦", title: "Pearl of Africa", desc: "Churchill named it that" }, continent: "Africa", discover: "Winston Churchill called it 'The Pearl of Africa' â home to half the world's mountain gorillas" },
+  "804": { name: "Ukraine", sticker: { icon: "ð»", title: "Sunflower Fields", desc: "Golden fields to the horizon" }, continent: "Europe", discover: "One of the world's largest producers of sunflower oil â fields stretch endlessly in summer" },
+  "826": { name: "United Kingdom", sticker: { icon: "ð", title: "The Crown", desc: "History at every corner" }, continent: "Europe", discover: "Big Ben is actually the name of the bell, not the tower â a fact most Londoners get wrong" },
+  "840": { name: "United States", sticker: { icon: "ð¦", title: "The American Road", desc: "From sea to shining sea" }, continent: "North America", discover: "Has 63 national parks spanning every climate zone â from Arctic tundra to tropical reef" },
+  "858": { name: "Uruguay", sticker: { icon: "ð§", title: "Mate Republic", desc: "Everyone carries a thermos" }, continent: "South America", discover: "Virtually everyone walks around with a mate gourd and thermos â it's a national lifestyle" },
+  "860": { name: "Uzbekistan", sticker: { icon: "ð", title: "Silk Road Jewel", desc: "Samarkand's turquoise domes" }, continent: "Asia", discover: "Samarkand's Registan Square is one of the most photographed places on the Silk Road" },
+  "862": { name: "Venezuela", sticker: { icon: "ð§", title: "Angel Falls", desc: "World's highest waterfall" }, continent: "South America", discover: "Angel Falls drops 979 meters â so tall that water turns to mist before reaching the bottom" },
+  "704": { name: "Vietnam", sticker: { icon: "ðï¸", title: "Xe Ãm", desc: "Life on two wheels" }, continent: "Asia", discover: "Ha Long Bay has nearly 2,000 limestone karst islands rising from emerald water" },
+  "887": { name: "Yemen", sticker: { icon: "ð°", title: "Skyscraper City", desc: "Ancient Manhattan in the desert" }, continent: "Asia", discover: "Shibam has 500-year-old mud-brick towers up to 11 stories â called the 'Manhattan of the Desert'" },
+  "894": { name: "Zambia", sticker: { icon: "ð§", title: "Victoria Falls", desc: "The smoke that thunders" }, continent: "Africa", discover: "Victoria Falls is 1.7 km wide â locals call it Mosi-oa-Tunya, 'The Smoke That Thunders'" },
+  "716": { name: "Zimbabwe", sticker: { icon: "ðï¸", title: "Great Zimbabwe", desc: "Medieval stone city of mystery" }, continent: "Africa", discover: "Great Zimbabwe's walls were built without mortar â the stones are so precise they still stand" },
 };
 
-// ─── Region/City data for structured location picker ────────
+// âââ Region/City data for structured location picker ââââââââ
 const REGION_DATA = {
   "840": { regions: [
     { name: "Alabama", cities: ["Birmingham", "Montgomery", "Huntsville", "Mobile"] },
@@ -287,11 +287,11 @@ const REGION_DATA = {
     { name: "Northern Ireland", cities: ["Belfast", "Derry", "Lisburn"] },
   ]},
   "250": { regions: [
-    { name: "Île-de-France", cities: ["Paris", "Versailles"] },
-    { name: "Provence-Alpes-Côte d'Azur", cities: ["Marseille", "Nice", "Cannes", "Toulon"] },
-    { name: "Auvergne-Rhône-Alpes", cities: ["Lyon", "Grenoble", "Chamonix"] },
+    { name: "Ãle-de-France", cities: ["Paris", "Versailles"] },
+    { name: "Provence-Alpes-CÃ´te d'Azur", cities: ["Marseille", "Nice", "Cannes", "Toulon"] },
+    { name: "Auvergne-RhÃ´ne-Alpes", cities: ["Lyon", "Grenoble", "Chamonix"] },
     { name: "Nouvelle-Aquitaine", cities: ["Bordeaux", "Limoges", "Poitiers"] },
-    { name: "Occitanie", cities: ["Toulouse", "Montpellier", "Nîmes"] },
+    { name: "Occitanie", cities: ["Toulouse", "Montpellier", "NÃ®mes"] },
     { name: "Brittany", cities: ["Rennes", "Brest", "Saint-Malo"] },
     { name: "Normandy", cities: ["Rouen", "Caen", "Le Havre"] },
   ]},
@@ -314,19 +314,19 @@ const REGION_DATA = {
     { name: "Hiroshima", cities: ["Hiroshima", "Onomichi", "Miyajima"] },
   ]},
   "484": { regions: [
-    { name: "Mexico City", cities: ["Mexico City", "Coyoacán", "Polanco"] },
-    { name: "Quintana Roo", cities: ["Cancún", "Playa del Carmen", "Tulum"] },
+    { name: "Mexico City", cities: ["Mexico City", "CoyoacÃ¡n", "Polanco"] },
+    { name: "Quintana Roo", cities: ["CancÃºn", "Playa del Carmen", "Tulum"] },
     { name: "Jalisco", cities: ["Guadalajara", "Puerto Vallarta", "Zapopan"] },
     { name: "Baja California", cities: ["Tijuana", "Ensenada", "Mexicali"] },
     { name: "Oaxaca", cities: ["Oaxaca City", "Huatulco", "Puerto Escondido"] },
-    { name: "Yucatán", cities: ["Mérida", "Valladolid", "Chichén Itzá"] },
+    { name: "YucatÃ¡n", cities: ["MÃ©rida", "Valladolid", "ChichÃ©n ItzÃ¡"] },
   ]},
   "076": { regions: [
-    { name: "São Paulo", cities: ["São Paulo", "Campinas", "Santos"] },
-    { name: "Rio de Janeiro", cities: ["Rio de Janeiro", "Niterói", "Búzios"] },
+    { name: "SÃ£o Paulo", cities: ["SÃ£o Paulo", "Campinas", "Santos"] },
+    { name: "Rio de Janeiro", cities: ["Rio de Janeiro", "NiterÃ³i", "BÃºzios"] },
     { name: "Bahia", cities: ["Salvador", "Porto Seguro", "Feira de Santana"] },
-    { name: "Minas Gerais", cities: ["Belo Horizonte", "Ouro Preto", "Uberlândia"] },
-    { name: "Distrito Federal", cities: ["Brasília"] },
+    { name: "Minas Gerais", cities: ["Belo Horizonte", "Ouro Preto", "UberlÃ¢ndia"] },
+    { name: "Distrito Federal", cities: ["BrasÃ­lia"] },
     { name: "Amazonas", cities: ["Manaus", "Parintins"] },
   ]},
   "036": { regions: [
@@ -351,19 +351,19 @@ const REGION_DATA = {
   "276": { regions: [
     { name: "Bavaria", cities: ["Munich", "Nuremberg", "Augsburg"] },
     { name: "Berlin", cities: ["Berlin"] },
-    { name: "North Rhine-Westphalia", cities: ["Cologne", "Düsseldorf", "Dortmund", "Essen"] },
-    { name: "Baden-Württemberg", cities: ["Stuttgart", "Freiburg", "Heidelberg"] },
+    { name: "North Rhine-Westphalia", cities: ["Cologne", "DÃ¼sseldorf", "Dortmund", "Essen"] },
+    { name: "Baden-WÃ¼rttemberg", cities: ["Stuttgart", "Freiburg", "Heidelberg"] },
     { name: "Hesse", cities: ["Frankfurt", "Wiesbaden", "Darmstadt"] },
     { name: "Saxony", cities: ["Leipzig", "Dresden"] },
     { name: "Hamburg", cities: ["Hamburg"] },
   ]},
   "724": { regions: [
     { name: "Catalonia", cities: ["Barcelona", "Girona", "Tarragona"] },
-    { name: "Madrid", cities: ["Madrid", "Alcalá de Henares"] },
-    { name: "Andalusia", cities: ["Seville", "Málaga", "Granada", "Córdoba"] },
-    { name: "Basque Country", cities: ["Bilbao", "San Sebastián", "Vitoria-Gasteiz"] },
+    { name: "Madrid", cities: ["Madrid", "AlcalÃ¡ de Henares"] },
+    { name: "Andalusia", cities: ["Seville", "MÃ¡laga", "Granada", "CÃ³rdoba"] },
+    { name: "Basque Country", cities: ["Bilbao", "San SebastiÃ¡n", "Vitoria-Gasteiz"] },
     { name: "Valencia", cities: ["Valencia", "Alicante"] },
-    { name: "Galicia", cities: ["Santiago de Compostela", "Vigo", "A Coruña"] },
+    { name: "Galicia", cities: ["Santiago de Compostela", "Vigo", "A CoruÃ±a"] },
     { name: "Balearic Islands", cities: ["Palma", "Ibiza"] },
     { name: "Canary Islands", cities: ["Tenerife", "Las Palmas", "Lanzarote"] },
   ]},
@@ -398,7 +398,7 @@ const REGION_DATA = {
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const YEARS = Array.from({ length: 30 }, (_, i) => 2026 - i); // 2026 down to 1997
 
-// ─── Country center coordinates [lng, lat] for search-zoom ──
+// âââ Country center coordinates [lng, lat] for search-zoom ââ
 // Approximate visual centers for each country's main landmass
 const COUNTRY_COORDS = {
   "004": [67, 33], "008": [20, 41], "012": [3, 28], "024": [17.5, -12.5],
@@ -445,7 +445,7 @@ const COUNTRY_COORDS = {
   "716": [29.8, -19.8],
 };
 
-// ─── Component ──────────────────────────────────────────────
+// âââ Component ââââââââââââââââââââââââââââââââââââââââââââââ
 function InteractiveWorldMap() {
   const [worldData, setWorldData] = useState(null);
   const [visited, setVisited] = useState(new Set());
@@ -656,10 +656,13 @@ function InteractiveWorldMap() {
     return db - da;
   });
 
-  return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    const isEmbedded = window !== window.parent;
 
-      {/* ─── Back Link ─── */}
+  return (
+    <div style={{ minHeight: isEmbedded ? "auto" : "100vh", background: C.bg, color: C.text, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+      {/* âââ Back Link âââ */}
+      {!isEmbedded && (
       <div style={{ width: "100%", maxWidth: 960, padding: "16px 16px 0" }}>
         <a href="index.html" style={{
           display: "inline-flex", alignItems: "center", gap: 6,
@@ -667,11 +670,13 @@ function InteractiveWorldMap() {
           padding: "6px 12px", borderRadius: 8, transition: "all 0.15s",
         }} onMouseEnter={e => { e.currentTarget.style.color = C.accent; e.currentTarget.style.background = `${C.accent}10`; }}
            onMouseLeave={e => { e.currentTarget.style.color = C.textSoft; e.currentTarget.style.background = "transparent"; }}>
-          ← Back to Venture
+          â Back to Venture
         </a>
       </div>
+      )}
 
-      {/* ─── Header ─── */}
+      {/* âââ Header âââ */}
+      {!isEmbedded && (
       <div style={{ padding: "16px 16px 0", textAlign: "center", width: "100%", maxWidth: 960 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}>
           <svg width={22} height={26} viewBox="0 0 100 120" fill="none" stroke={C.accent} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round">
@@ -683,18 +688,19 @@ function InteractiveWorldMap() {
         <p style={{ color: C.textSoft, fontSize: 14, margin: "8px 0 0", fontWeight: 400, lineHeight: 1.5 }}>
           {visited.size === 0
             ? "Where did your story begin? Click any country to start."
-            : `${visited.size} of 195 countries · ${conts.size} continent${conts.size !== 1 ? "s" : ""} · ${((visited.size / 195) * 100).toFixed(1)}% of the world`
+            : `${visited.size} of 195 countries Â· ${conts.size} continent${conts.size !== 1 ? "s" : ""} Â· ${((visited.size / 195) * 100).toFixed(1)}% of the world`
           }
         </p>
       </div>
+      )}
 
-      {/* ─── Stats Bar ─── */}
+      {/* âââ Stats Bar âââ */}
       <div style={{ display: "flex", gap: 0, margin: "20px 16px 0", background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: `0 2px 12px ${C.shadow}`, overflow: "hidden", flexWrap: "wrap" }}>
         {[
           { value: visited.size, label: "of 195 countries" },
           { value: conts.size, label: "of 7 continents" },
           { value: visited.size > 0 ? ((visited.size / 195) * 100).toFixed(1) + "%" : "0%", label: "of the world" },
-          { value: xp, label: `XP · ${title}` },
+          { value: xp, label: `XP Â· ${title}` },
         ].map((s, i) => (
           <div key={i} style={{ textAlign: "center", padding: "16px 24px", borderRight: i < 3 ? `1px solid ${C.borderLight}` : "none", minWidth: 100, flex: "1 1 auto" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: C.accent, lineHeight: 1 }}>{s.value}</div>
@@ -703,7 +709,7 @@ function InteractiveWorldMap() {
         ))}
       </div>
 
-      {/* ─── Tab Toggle + Search ─── */}
+      {/* âââ Tab Toggle + Search âââ */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 16px 0", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ display: "flex", background: C.bgDeep, borderRadius: 12, padding: 3, gap: 2 }}>
           {["map", "passport"].map(tab => (
@@ -715,7 +721,7 @@ function InteractiveWorldMap() {
               boxShadow: activeTab === tab ? `0 1px 4px ${C.shadow}` : "none",
               transition: "all 0.2s ease",
             }}>
-              {tab === "map" ? "🗺️ World Map" : "📔 Passport"}
+              {tab === "map" ? "ðºï¸ World Map" : "ð Passport"}
             </button>
           ))}
         </div>
@@ -731,7 +737,7 @@ function InteractiveWorldMap() {
                 fontSize: 13, color: C.textSoft, fontWeight: 500,
               }}
             >
-              🔍 Search countries
+              ð Search countries
             </div>
             {showSearch && (
               <div style={{
@@ -762,7 +768,7 @@ function InteractiveWorldMap() {
                           <span style={{ fontSize: 20 }}>{r.sticker.icon}</span>
                           <div style={{ minWidth: 0 }}>
                             <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{r.name}</div>
-                            <div style={{ fontSize: 11, color: C.textMuted }}>{r.continent} {visited.has(r.id) ? "· ✓ Visited" : ""}</div>
+                            <div style={{ fontSize: 11, color: C.textMuted }}>{r.continent} {visited.has(r.id) ? "Â· â Visited" : ""}</div>
                           </div>
                         </div>
                         {!visited.has(r.id) ? (
@@ -781,7 +787,7 @@ function InteractiveWorldMap() {
                             color: C.accent, fontSize: 12, fontWeight: 600, cursor: "pointer",
                             whiteSpace: "nowrap",
                           }}>
-                            ✏️ Edit
+                            âï¸ Edit
                           </div>
                         )}
                       </div>
@@ -794,7 +800,7 @@ function InteractiveWorldMap() {
         )}
       </div>
 
-      {/* ─── Toast ─── */}
+      {/* âââ Toast âââ */}
       {showToast && unlockedC && (
         <div style={{
           position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)",
@@ -810,13 +816,13 @@ function InteractiveWorldMap() {
           }}>{unlockedC.sticker.icon}</div>
           <div>
             <div style={{ fontWeight: 700, fontSize: 15 }}>{unlockedC.sticker.title}</div>
-            <div style={{ fontSize: 12, color: C.textSoft }}>{unlockedC.name} — {unlockedC.sticker.desc}</div>
-            <div style={{ fontSize: 10, color: C.accent, fontWeight: 600, marginTop: 2 }}>+10 XP earned · Add a memory for +15 more</div>
+            <div style={{ fontSize: 12, color: C.textSoft }}>{unlockedC.name} â {unlockedC.sticker.desc}</div>
+            <div style={{ fontSize: 10, color: C.accent, fontWeight: 600, marginTop: 2 }}>+10 XP earned Â· Add a memory for +15 more</div>
           </div>
         </div>
       )}
 
-      {/* ─── Memory Modal (Journal-Style) ─── */}
+      {/* âââ Memory Modal (Journal-Style) âââ */}
       {showMemoryModal && COUNTRY_DATA[showMemoryModal] && (() => {
         const mc = COUNTRY_DATA[showMemoryModal];
         const color = C.cont[mc.continent];
@@ -847,9 +853,9 @@ function InteractiveWorldMap() {
               </div>
 
               <div style={{ padding: "24px 28px 28px" }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 20 }}>📖 Your Travel Page</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 20 }}>ð Your Travel Page</div>
 
-                {/* ── Where ── */}
+                {/* ââ Where ââ */}
                 <div style={{ marginBottom: 16 }}>
                   <label style={labelStyle}>WHERE DID YOU GO? (+5 XP)</label>
                   {regions.length > 0 ? (
@@ -905,7 +911,7 @@ function InteractiveWorldMap() {
                   )}
                 </div>
 
-                {/* ── When ── */}
+                {/* ââ When ââ */}
                 <div style={{ marginBottom: 16 }}>
                   <label style={labelStyle}>WHEN DID YOU VISIT? (+5 XP)</label>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -928,7 +934,7 @@ function InteractiveWorldMap() {
                   </div>
                 </div>
 
-                {/* ── Memory ── */}
+                {/* ââ Memory ââ */}
                 <div style={{ marginBottom: 16 }}>
                   <label style={labelStyle}>YOUR MEMORY (+15 XP)</label>
                   <textarea
@@ -939,7 +945,7 @@ function InteractiveWorldMap() {
                   />
                 </div>
 
-                {/* ── Photo ── */}
+                {/* ââ Photo ââ */}
                 <div style={{ marginBottom: 20 }}>
                   <label style={labelStyle}>DROP A PHOTO (coming soon)</label>
                   <div style={{
@@ -947,7 +953,7 @@ function InteractiveWorldMap() {
                     textAlign: "center", color: C.textMuted, fontSize: 13, background: C.bgDeep,
                     cursor: "not-allowed", opacity: 0.6,
                   }}>
-                    📷 Drag & drop your photo here
+                    ð· Drag & drop your photo here
                     <div style={{ fontSize: 11, marginTop: 4 }}>Photo uploads coming in the next update</div>
                   </div>
                 </div>
@@ -969,7 +975,7 @@ function InteractiveWorldMap() {
         );
       })()}
 
-      {/* ─── Share Card ─── */}
+      {/* âââ Share Card âââ */}
       {showShareCard && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(58,74,92,0.25)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }} onClick={() => setShowShareCard(false)}>
           <div onClick={e => e.stopPropagation()} style={{
@@ -985,10 +991,10 @@ function InteractiveWorldMap() {
             </div>
             <div style={{ fontSize: 60, fontWeight: 800, color: C.accent, lineHeight: 1 }}>{visited.size}</div>
             <div style={{ fontSize: 15, color: C.textSoft, marginBottom: 8 }}>of 195 countries explored</div>
-            <div style={{ fontSize: 44, marginBottom: 6 }}>{conts.size >= 6 ? "🌍" : conts.size >= 4 ? "✈️" : conts.size >= 2 ? "🧳" : "🗺️"}</div>
+            <div style={{ fontSize: 44, marginBottom: 6 }}>{conts.size >= 6 ? "ð" : conts.size >= 4 ? "âï¸" : conts.size >= 2 ? "ð§³" : "ðºï¸"}</div>
             <div style={{ fontSize: 20, fontWeight: 700, color: C.text, marginBottom: 4 }}>{title}</div>
             <div style={{ fontSize: 13, color: C.textSoft, marginBottom: 24 }}>
-              {conts.size} continent{conts.size !== 1 ? "s" : ""} · {xp} XP · {((visited.size / 195) * 100).toFixed(1)}% of the world
+              {conts.size} continent{conts.size !== 1 ? "s" : ""} Â· {xp} XP Â· {((visited.size / 195) * 100).toFixed(1)}% of the world
             </div>
             <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 28, flexWrap: "wrap" }}>
               {visitedArr.slice(0, 10).map(c => (
@@ -1000,14 +1006,14 @@ function InteractiveWorldMap() {
               {visitedArr.length > 10 && <div style={{ width: 42, height: 42, borderRadius: 11, background: C.bgDeep, border: `1.5px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.textSoft }}>+{visitedArr.length - 10}</div>}
             </div>
             <div onClick={() => setShowShareCard(false)} style={{ padding: "14px 28px", borderRadius: 14, background: C.accent, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", display: "inline-block" }}>
-              Screenshot & Share ✨
+              Screenshot & Share â¨
             </div>
-            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 12 }}>venture.app — coming soon</div>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 12 }}>venture.app â coming soon</div>
           </div>
         </div>
       )}
 
-      {/* ─── MAP TAB ─── */}
+      {/* âââ MAP TAB âââ */}
       {activeTab === "map" && (
         <div style={{ width: "100%", maxWidth: 960, padding: "20px 16px 0" }}>
           <div
@@ -1026,7 +1032,7 @@ function InteractiveWorldMap() {
             {!worldData ? (
               <div style={{ height: 460, display: "flex", alignItems: "center", justifyContent: "center", color: C.textMuted }}>
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>🌍</div>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>ð</div>
                   <div style={{ fontSize: 14 }}>Loading your world...</div>
                 </div>
               </div>
@@ -1075,18 +1081,18 @@ function InteractiveWorldMap() {
                 const cx = width / 2, cy = height / 2;
                 const ratio = nk / p.k;
                 return { k: nk, x: cx - ratio * (cx - p.x), y: cy - ratio * (cy - p.y) };
-              })} style={zoomBtnStyle}>−</button>
+              })} style={zoomBtnStyle}>â</button>
               {transform.k > 1 && <button onClick={resetZoom} style={{ ...zoomBtnStyle, fontSize: 10, width: "auto", padding: "0 10px" }}>Reset</button>}
             </div>
 
             {/* Zoom hint */}
             {transform.k <= 1 && visited.size === 0 && (
               <div style={{ position: "absolute", bottom: 12, left: 12, fontSize: 11, color: C.textMuted, background: `${C.card}cc`, padding: "6px 12px", borderRadius: 8, backdropFilter: "blur(4px)" }}>
-                Scroll to zoom · Click countries to visit
+                Scroll to zoom Â· Click countries to visit
               </div>
             )}
 
-            {/* Tooltip with discovery prompt — positioned away from cursor to never block clicks */}
+            {/* Tooltip with discovery prompt â positioned away from cursor to never block clicks */}
             {hovered && hoveredC && !isDragging && (
               <div style={{
                 position: "absolute",
@@ -1107,19 +1113,19 @@ function InteractiveWorldMap() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{hoveredC.name}</div>
                     <div style={{ fontSize: 11, color: C.textSoft }}>
-                      {visited.has(hovered) ? `✓ Visited · ${hoveredC.sticker.title}` : hoveredC.continent}
+                      {visited.has(hovered) ? `â Visited Â· ${hoveredC.sticker.title}` : hoveredC.continent}
                     </div>
                   </div>
                 </div>
                 {!visited.has(hovered) && hoveredC.discover && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.borderLight}`, fontSize: 12, color: C.textSoft, lineHeight: 1.5, fontStyle: "italic" }}>
-                    💡 {hoveredC.discover}
+                    ð¡ {hoveredC.discover}
                   </div>
                 )}
                 {visited.has(hovered) && (memories[hovered]?.note || memories[hovered]?.location) && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.borderLight}`, fontSize: 12, color: C.textSoft, lineHeight: 1.5 }}>
-                    {memories[hovered].location && <div>📍 {memories[hovered].location}{memories[hovered].date ? ` · ${memories[hovered].date}` : ""}</div>}
-                    {memories[hovered].note && <div style={{ marginTop: memories[hovered].location ? 4 : 0 }}>📌 "{memories[hovered].note}"</div>}
+                    {memories[hovered].location && <div>ð {memories[hovered].location}{memories[hovered].date ? ` Â· ${memories[hovered].date}` : ""}</div>}
+                    {memories[hovered].note && <div style={{ marginTop: memories[hovered].location ? 4 : 0 }}>ð "{memories[hovered].note}"</div>}
                   </div>
                 )}
               </div>
@@ -1128,12 +1134,12 @@ function InteractiveWorldMap() {
         </div>
       )}
 
-      {/* ─── PASSPORT TAB (Book Style) ─── */}
+      {/* âââ PASSPORT TAB (Book Style) âââ */}
       {activeTab === "passport" && (
         <div style={{ width: "100%", maxWidth: 700, padding: "20px 16px" }}>
           {visitedArr.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 20px", background: C.card, borderRadius: 24, border: `1px solid ${C.border}`, boxShadow: `0 4px 20px ${C.shadow}` }}>
-              <div style={{ fontSize: 52, marginBottom: 14 }}>📔</div>
+              <div style={{ fontSize: 52, marginBottom: 14 }}>ð</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: C.text, marginBottom: 6 }}>Your passport is empty</div>
               <div style={{ fontSize: 14, color: C.textSoft, lineHeight: 1.6 }}>
                 Switch to the map and click countries you've visited<br/>to start filling your travel journal
@@ -1143,9 +1149,9 @@ function InteractiveWorldMap() {
             <div>
               {/* Page indicator */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <button disabled={passportPage <= 0} onClick={() => setPassportPage(p => p - 1)} style={{ ...navBtnStyle, opacity: passportPage <= 0 ? 0.3 : 1 }}>← Prev</button>
+                <button disabled={passportPage <= 0} onClick={() => setPassportPage(p => p - 1)} style={{ ...navBtnStyle, opacity: passportPage <= 0 ? 0.3 : 1 }}>â Prev</button>
                 <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 600 }}>Page {passportPage + 1} of {visitedArr.length}</span>
-                <button disabled={passportPage >= visitedArr.length - 1} onClick={() => setPassportPage(p => p + 1)} style={{ ...navBtnStyle, opacity: passportPage >= visitedArr.length - 1 ? 0.3 : 1 }}>Next →</button>
+                <button disabled={passportPage >= visitedArr.length - 1} onClick={() => setPassportPage(p => p + 1)} style={{ ...navBtnStyle, opacity: passportPage >= visitedArr.length - 1 ? 0.3 : 1 }}>Next â</button>
               </div>
 
               {/* Passport page */}
@@ -1158,7 +1164,7 @@ function InteractiveWorldMap() {
                     background: C.card, borderRadius: 24, overflow: "hidden",
                     border: `1px solid ${C.border}`, boxShadow: `0 8px 32px ${C.shadow}`,
                   }}>
-                    {/* Page header — stamp style */}
+                    {/* Page header â stamp style */}
                     <div style={{
                       background: `linear-gradient(135deg, ${color}08, ${color}15)`,
                       borderBottom: `1px solid ${color}15`, padding: "32px 32px 28px",
@@ -1174,8 +1180,8 @@ function InteractiveWorldMap() {
                         <div style={{ fontSize: 13, color: C.textSoft, fontStyle: "italic", marginTop: 2 }}>{c.sticker.desc}</div>
                         <div style={{ fontSize: 11, color: C.textMuted, marginTop: 6 }}>
                           {c.continent}
-                          {c.memory?.location ? ` · 📍 ${c.memory.location}` : ""}
-                          {c.memory?.date ? ` · ${c.memory.date}` : ""}
+                          {c.memory?.location ? ` Â· ð ${c.memory.location}` : ""}
+                          {c.memory?.date ? ` Â· ${c.memory.date}` : ""}
                         </div>
                       </div>
                     </div>
@@ -1210,7 +1216,7 @@ function InteractiveWorldMap() {
                         padding: "28px 20px", textAlign: "center", color: C.textMuted, fontSize: 13,
                         background: `${C.bgDeep}80`,
                       }}>
-                        📷 Your photo from {c.name}
+                        ð· Your photo from {c.name}
                         <div style={{ fontSize: 11, marginTop: 4 }}>Photo uploads coming soon</div>
                       </div>
 
@@ -1242,20 +1248,20 @@ function InteractiveWorldMap() {
         </div>
       )}
 
-      {/* ─── Bottom Actions ─── */}
+      {/* âââ Bottom Actions âââ */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", padding: "20px 16px 40px" }}>
         {visited.size >= 1 && (
           <button onClick={() => setShowShareCard(true)} style={{
             display: "flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 14, border: "none",
             background: C.accent, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer",
             boxShadow: `0 4px 20px rgba(91,140,90,0.25)`,
-          }}>✨ Share Your Journey</button>
+          }}>â¨ Share Your Journey</button>
         )}
         {visited.size >= 3 && (
           <button style={{
             padding: "14px 28px", borderRadius: 14, border: `2px solid ${C.accentWarm}`,
             background: "transparent", color: C.accentWarm, fontWeight: 700, fontSize: 14, cursor: "pointer",
-          }}>Keep your map forever — Join Waitlist</button>
+          }}>Keep your map forever â Join Waitlist</button>
         )}
       </div>
 
