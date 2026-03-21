@@ -700,12 +700,110 @@ function InteractiveWorldMap() {
     return "Dreamer";
   };
 
+  // ─── Passport Tier System ────────────────────────────────────
+  const getTier = (count) => {
+    if (count >= 100) return { name: "Diamond", icon: "💎", color: "#B9F2FF", colorSolid: "#7DD3E8", colorBg: "#E8FAFE", next: null, threshold: 100 };
+    if (count >= 50) return { name: "Platinum", icon: "⚜️", color: "#E8E0F0", colorSolid: "#9B7FC4", colorBg: "#F5F0FA", next: 100, threshold: 50 };
+    if (count >= 30) return { name: "Gold", icon: "🥇", color: "#FFE4A0", colorSolid: "#D4A520", colorBg: "#FFF8E7", next: 50, threshold: 30 };
+    if (count >= 15) return { name: "Silver", icon: "🥈", color: "#E0E4E8", colorSolid: "#8A95A5", colorBg: "#F4F6F8", next: 30, threshold: 15 };
+    if (count >= 5) return { name: "Bronze", icon: "🥉", color: "#F0D5B8", colorSolid: "#B87333", colorBg: "#FAF0E6", next: 15, threshold: 5 };
+    return { name: "Starter", icon: "🗺️", color: "#E8E8E8", colorSolid: "#999", colorBg: "#F5F5F5", next: 5, threshold: 0 };
+  };
+
+  // ─── Regional Collections ────────────────────────────────────
+  const COLLECTIONS = [
+    { id: "europe", name: "European Grand Tour", icon: "🏰", desc: "Master the old continent", continent: "Europe", target: 10 },
+    { id: "asia", name: "Silk Road Explorer", icon: "🐉", desc: "Journey through the East", continent: "Asia", target: 8 },
+    { id: "africa", name: "African Safari", icon: "🦁", desc: "Discover the motherland", continent: "Africa", target: 8 },
+    { id: "namerica", name: "Americas Pioneer", icon: "🦅", desc: "Coast to coast and beyond", continent: "North America", target: 6 },
+    { id: "samerica", name: "South American Spirit", icon: "🌿", desc: "Rhythm, nature, and wonder", continent: "South America", target: 5 },
+    { id: "oceania", name: "Pacific Voyager", icon: "🌊", desc: "Islands of the endless blue", continent: "Oceania", target: 3 },
+  ];
+
+  const getCollectionProgress = (visitedSet) => {
+    return COLLECTIONS.map(col => {
+      const countriesInRegion = Object.entries(COUNTRY_DATA).filter(([, c]) => c.continent === col.continent);
+      const visitedInRegion = countriesInRegion.filter(([id]) => visitedSet.has(id));
+      const progress = Math.min(visitedInRegion.length, col.target);
+      const completed = progress >= col.target;
+      return { ...col, progress, total: countriesInRegion.length, completed, visitedList: visitedInRegion };
+    });
+  };
+
+  // ─── Memory Quality Score ────────────────────────────────────
+  const getMemoryScore = (memory) => {
+    if (!memory) return { score: 0, level: "empty", stars: 0, label: "No memory" };
+    let pts = 0;
+    if (memory.note) pts++;
+    if (memory.location || memory.region || memory.customLocation) pts++;
+    if (memory.date || (memory.month && memory.year)) pts++;
+    if (memory.photos?.length > 0) pts++;
+    if (memory.photos?.length >= 3) pts++;
+    const levels = [
+      { level: "empty", stars: 0, label: "No memory" },
+      { level: "basic", stars: 1, label: "Stamped" },
+      { level: "developing", stars: 2, label: "Noted" },
+      { level: "solid", stars: 3, label: "Detailed" },
+      { level: "rich", stars: 4, label: "Rich Memory" },
+      { level: "complete", stars: 5, label: "Complete Memory ✨" },
+    ];
+    return { score: pts, ...levels[pts] };
+  };
+
+  // ─── Sticker Evolution ───────────────────────────────────────
+  // Level 0: basic stamp (just visited, no details)
+  // Level 1: illustrated (has note OR location)
+  // Level 2: detailed (has note AND location AND date)
+  // Level 3: premium (all details + 3+ photos) — holographic border
+  const getStickerLevel = (memory) => {
+    if (!memory) return 0;
+    const hasNote = !!memory.note;
+    const hasLocation = !!(memory.location || memory.region || memory.customLocation);
+    const hasDate = !!(memory.date || (memory.month && memory.year));
+    const hasPhotos = (memory.photos?.length || 0) >= 1;
+    const manyPhotos = (memory.photos?.length || 0) >= 3;
+    if (hasNote && hasLocation && hasDate && manyPhotos) return 3;
+    if (hasNote && hasLocation && hasDate) return 2;
+    if (hasNote || hasLocation) return 1;
+    return 0;
+  };
+
+  const stickerStyles = [
+    // Level 0 — Basic stamp
+    (color) => ({
+      border: `2px dashed ${color}40`,
+      background: `${color}08`,
+      boxShadow: "none",
+    }),
+    // Level 1 — Illustrated
+    (color) => ({
+      border: `2.5px solid ${color}50`,
+      background: `${color}12`,
+      boxShadow: `0 2px 8px ${color}15`,
+    }),
+    // Level 2 — Detailed
+    (color) => ({
+      border: `3px solid ${color}70`,
+      background: `linear-gradient(135deg, ${color}15, ${color}08)`,
+      boxShadow: `0 4px 16px ${color}20`,
+    }),
+    // Level 3 — Premium holographic
+    (color) => ({
+      border: `3px solid ${color}`,
+      background: `linear-gradient(135deg, ${color}20, #fff, ${color}15)`,
+      boxShadow: `0 4px 20px ${color}30, inset 0 1px 2px rgba(255,255,255,0.6)`,
+      animation: "holographicShimmer 3s ease infinite",
+    }),
+  ];
+
   const width = 900, height = 460;
   const projection = d3.geoNaturalEarth1().scale(155).translate([width / 2, height / 2]);
   const pathGenerator = d3.geoPath().projection(projection);
   const conts = new Set([...visited].map(id => COUNTRY_DATA[id]?.continent).filter(Boolean));
   const xp = calculateXP();
   const title = getTitle(xp);
+  const tier = getTier(visited.size);
+  const collections = getCollectionProgress(visited);
   const unlockedC = lastUnlocked ? COUNTRY_DATA[lastUnlocked] : null;
   const hoveredC = hovered ? COUNTRY_DATA[hovered] : null;
   const visitedArr = [...visited].filter(id => COUNTRY_DATA[id]).map(id => ({ id, ...COUNTRY_DATA[id], memory: memories[id] })).sort((a, b) => {
@@ -778,10 +876,45 @@ function InteractiveWorldMap() {
         ))}
       </div>
 
+      {/* ─── Tier Badge ─── */}
+      {visited.size > 0 && (
+        <div style={{
+          margin: "12px 16px 0", padding: "14px 20px", background: tier.colorBg,
+          borderRadius: 14, border: `1px solid ${tier.colorSolid}25`,
+          display: "flex", alignItems: "center", gap: 14, maxWidth: 700, width: "calc(100% - 32px)",
+        }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: 12, background: `${tier.colorSolid}15`,
+            border: `2px solid ${tier.colorSolid}40`, display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 22,
+          }}>{tier.icon}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: tier.colorSolid }}>{tier.name} Passport</span>
+              {tier.next && (
+                <span style={{ fontSize: 11, color: C.textMuted }}>{tier.next - visited.size} more to {getTier(tier.next).name}</span>
+              )}
+            </div>
+            {tier.next && (
+              <div style={{ height: 6, borderRadius: 3, background: `${tier.colorSolid}15`, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%", borderRadius: 3, background: tier.colorSolid,
+                  width: `${((visited.size - tier.threshold) / (tier.next - tier.threshold)) * 100}%`,
+                  transition: "width 0.5s ease",
+                }} />
+              </div>
+            )}
+            {!tier.next && (
+              <div style={{ fontSize: 11, color: tier.colorSolid, fontWeight: 600 }}>Maximum tier achieved! You're a true explorer.</div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ─── Tab Toggle + Search ─── */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 16px 0", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ display: "flex", background: C.bgDeep, borderRadius: 12, padding: 3, gap: 2 }}>
-          {["map", "passport"].map(tab => (
+          {["map", "passport", "collections"].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
               padding: "9px 24px", borderRadius: 10, border: "none",
               background: activeTab === tab ? C.card : "transparent",
@@ -790,7 +923,7 @@ function InteractiveWorldMap() {
               boxShadow: activeTab === tab ? `0 1px 4px ${C.shadow}` : "none",
               transition: "all 0.2s ease",
             }}>
-              {tab === "map" ? "🗺️ World Map" : "📔 Passport"}
+              {tab === "map" ? "🗺️ World Map" : tab === "passport" ? "📔 Passport" : "🏆 Collections"}
             </button>
           ))}
         </div>
@@ -900,7 +1033,7 @@ function InteractiveWorldMap() {
           <div>
             <div style={{ fontWeight: 700, fontSize: 15 }}>{unlockedC.sticker.title}</div>
             <div style={{ fontSize: 12, color: C.textSoft }}>{unlockedC.name} — {unlockedC.sticker.desc}</div>
-            <div style={{ fontSize: 10, color: C.accent, fontWeight: 600, marginTop: 2 }}>+10 XP earned · Add a memory for +15 more</div>
+            <div style={{ fontSize: 10, color: C.accent, fontWeight: 600, marginTop: 2 }}>+10 XP earned · Add details to evolve your sticker!</div>
           </div>
         </div>
       )}
@@ -1255,7 +1388,10 @@ function InteractiveWorldMap() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{hoveredC.name}</div>
                     <div style={{ fontSize: 11, color: C.textSoft }}>
-                      {visited.has(hovered) ? `✓ Visited · ${hoveredC.sticker.title}` : hoveredC.continent}
+                      {visited.has(hovered) ? (() => {
+                        const ms = getMemoryScore(memories[hovered]);
+                        return `✓ Visited · ${"★".repeat(ms.stars)}${"☆".repeat(5 - ms.stars)}`;
+                      })() : hoveredC.continent}
                     </div>
                   </div>
                 </div>
@@ -1307,27 +1443,61 @@ function InteractiveWorldMap() {
                     background: C.card, borderRadius: 24, overflow: "hidden",
                     border: `1px solid ${C.border}`, boxShadow: `0 8px 32px ${C.shadow}`,
                   }}>
-                    {/* Page header — stamp style */}
-                    <div style={{
-                      background: `linear-gradient(135deg, ${color}08, ${color}15)`,
-                      borderBottom: `1px solid ${color}15`, padding: "32px 32px 28px",
-                      display: "flex", alignItems: "center", gap: 20,
-                    }}>
-                      <div style={{
-                        width: 80, height: 80, borderRadius: 22, background: `${color}12`,
-                        border: `3px solid ${color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 42,
-                      }}>{c.sticker.icon}</div>
-                      <div>
-                        <div style={{ fontWeight: 800, fontSize: 24, color: C.text, lineHeight: 1.2 }}>{c.name}</div>
-                        <div style={{ fontSize: 14, color, fontWeight: 700, marginTop: 2 }}>{c.sticker.title}</div>
-                        <div style={{ fontSize: 13, color: C.textSoft, fontStyle: "italic", marginTop: 2 }}>{c.sticker.desc}</div>
-                        <div style={{ fontSize: 11, color: C.textMuted, marginTop: 6 }}>
-                          {c.continent}
-                          {c.memory?.location ? ` · 📍 ${c.memory.location}` : ""}
-                          {c.memory?.date ? ` · ${c.memory.date}` : ""}
+                    {/* Page header — stamp style with sticker evolution */}
+                    {(() => {
+                      const sLevel = getStickerLevel(c.memory);
+                      const sStyle = stickerStyles[sLevel](color);
+                      const memScore = getMemoryScore(c.memory);
+                      const levelLabels = ["Basic Stamp", "Illustrated", "Detailed", "Premium ✨"];
+                      return (
+                        <div style={{
+                          background: `linear-gradient(135deg, ${color}08, ${color}15)`,
+                          borderBottom: `1px solid ${color}15`, padding: "32px 32px 28px",
+                          display: "flex", alignItems: "center", gap: 20,
+                        }}>
+                          <div style={{
+                            width: 80, height: 80, borderRadius: 22,
+                            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 42,
+                            transition: "all 0.3s ease",
+                            position: "relative",
+                            ...sStyle,
+                          }}>
+                            {c.sticker.icon}
+                            {sLevel === 3 && (
+                              <div style={{
+                                position: "absolute", top: -4, right: -4,
+                                width: 20, height: 20, borderRadius: 10,
+                                background: "#D4A520", display: "flex", alignItems: "center",
+                                justifyContent: "center", fontSize: 10, color: "#fff",
+                                boxShadow: "0 2px 6px rgba(212,165,32,0.4)",
+                              }}>✦</div>
+                            )}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 800, fontSize: 24, color: C.text, lineHeight: 1.2 }}>{c.name}</div>
+                            <div style={{ fontSize: 14, color, fontWeight: 700, marginTop: 2 }}>{c.sticker.title}</div>
+                            <div style={{ fontSize: 13, color: C.textSoft, fontStyle: "italic", marginTop: 2 }}>{c.sticker.desc}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+                              <span style={{ fontSize: 11, color: C.textMuted }}>
+                                {c.continent}
+                                {c.memory?.location ? ` · 📍 ${c.memory.location}` : ""}
+                                {c.memory?.date ? ` · ${c.memory.date}` : ""}
+                              </span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 6,
+                                background: sLevel >= 3 ? `#D4A52020` : sLevel >= 2 ? `${color}15` : `${C.bgDeep}`,
+                                color: sLevel >= 3 ? "#D4A520" : sLevel >= 2 ? color : C.textMuted,
+                              }}>{levelLabels[sLevel]}</span>
+                              <span style={{ fontSize: 12, letterSpacing: 1 }}>
+                                {"★".repeat(memScore.stars)}{"☆".repeat(5 - memScore.stars)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      );
+                    })()}
 
                     {/* Page body */}
                     <div style={{ padding: "28px 32px 32px" }}>
@@ -1446,7 +1616,7 @@ function InteractiveWorldMap() {
                           }
                         }} style={{
                           padding: "12px 20px", borderRadius: 12,
-                          border: "1px solid #e05555", background: "transparent",
+                          border: `1px solid #e05555`, background: "transparent",
                           color: "#e05555", fontWeight: 600, fontSize: 13, cursor: "pointer",
                           transition: "all 0.2s ease",
                         }}
@@ -1480,6 +1650,171 @@ function InteractiveWorldMap() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ─── COLLECTIONS TAB ─── */}
+      {activeTab === "collections" && (
+        <div style={{ width: "100%", maxWidth: 700, padding: "20px 16px" }}>
+          {/* Tier Overview Card */}
+          <div style={{
+            background: `linear-gradient(135deg, ${tier.colorBg}, ${C.card})`,
+            borderRadius: 20, padding: "28px 28px 24px", marginBottom: 20,
+            border: `1px solid ${tier.colorSolid}20`,
+            boxShadow: `0 4px 20px ${C.shadow}`,
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: 48, marginBottom: 8 }}>{tier.icon}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: tier.colorSolid }}>{tier.name} Passport</div>
+            <div style={{ fontSize: 13, color: C.textSoft, marginTop: 4, marginBottom: 16 }}>
+              {visited.size} countries visited · {xp} XP
+            </div>
+            {/* All tiers display */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+              {[
+                { name: "Starter", icon: "🗺️", min: 0, solid: "#999" },
+                { name: "Bronze", icon: "🥉", min: 5, solid: "#B87333" },
+                { name: "Silver", icon: "🥈", min: 15, solid: "#8A95A5" },
+                { name: "Gold", icon: "🥇", min: 30, solid: "#D4A520" },
+                { name: "Platinum", icon: "⚜️", min: 50, solid: "#9B7FC4" },
+                { name: "Diamond", icon: "💎", min: 100, solid: "#7DD3E8" },
+              ].map((t, i) => {
+                const isActive = visited.size >= t.min;
+                const isCurrent = tier.name === t.name;
+                return (
+                  <div key={i} style={{
+                    padding: "8px 12px", borderRadius: 10,
+                    background: isCurrent ? `${t.solid}20` : isActive ? `${t.solid}08` : `${C.bgDeep}`,
+                    border: isCurrent ? `2px solid ${t.solid}` : `1px solid ${isActive ? t.solid + "30" : C.border}`,
+                    opacity: isActive ? 1 : 0.4,
+                    textAlign: "center", minWidth: 70,
+                  }}>
+                    <div style={{ fontSize: 18 }}>{t.icon}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: isActive ? t.solid : C.textMuted, marginTop: 2 }}>{t.name}</div>
+                    <div style={{ fontSize: 9, color: C.textMuted }}>{t.min}+</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Regional Collections */}
+          <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 14 }}>🌍 Regional Collections</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {collections.map(col => (
+              <div key={col.id} style={{
+                background: C.card, borderRadius: 16, padding: "18px 20px",
+                border: col.completed ? `2px solid ${C.accent}` : `1px solid ${C.border}`,
+                boxShadow: col.completed ? `0 4px 16px ${C.accent}15` : `0 2px 8px ${C.shadow}`,
+                transition: "all 0.2s ease",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{
+                    width: 48, height: 48, borderRadius: 14,
+                    background: col.completed ? `${C.accent}12` : C.bgDeep,
+                    border: col.completed ? `2px solid ${C.accent}30` : `1px solid ${C.border}`,
+                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+                  }}>
+                    {col.completed ? "✅" : col.icon}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{col.name}</span>
+                      {col.completed && (
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, color: C.accent, background: `${C.accent}12`,
+                          padding: "2px 8px", borderRadius: 6,
+                        }}>COMPLETE</span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 12, color: C.textSoft, marginTop: 2 }}>{col.desc}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
+                      <div style={{ flex: 1, height: 6, borderRadius: 3, background: C.bgDeep, overflow: "hidden" }}>
+                        <div style={{
+                          height: "100%", borderRadius: 3,
+                          background: col.completed ? C.accent : `${C.accent}80`,
+                          width: `${(col.progress / col.target) * 100}%`,
+                          transition: "width 0.5s ease",
+                        }} />
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: col.completed ? C.accent : C.textMuted, whiteSpace: "nowrap" }}>
+                        {col.progress}/{col.target}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Show visited countries in this collection */}
+                {col.visitedList.length > 0 && (
+                  <div style={{ display: "flex", gap: 4, marginTop: 12, flexWrap: "wrap" }}>
+                    {col.visitedList.slice(0, 12).map(([id, c]) => (
+                      <div key={id} title={c.name} style={{
+                        width: 32, height: 32, borderRadius: 8,
+                        background: `${C.cont[c.continent]}10`, border: `1px solid ${C.cont[c.continent]}25`,
+                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+                      }}>{c.sticker.icon}</div>
+                    ))}
+                    {col.visitedList.length > 12 && (
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 8, background: C.bgDeep,
+                        border: `1px solid ${C.border}`, display: "flex", alignItems: "center",
+                        justifyContent: "center", fontSize: 10, fontWeight: 700, color: C.textMuted,
+                      }}>+{col.visitedList.length - 12}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Memory Quality Overview */}
+          <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginTop: 28, marginBottom: 14 }}>⭐ Memory Quality</div>
+          <div style={{
+            background: C.card, borderRadius: 16, padding: "20px",
+            border: `1px solid ${C.border}`, boxShadow: `0 2px 8px ${C.shadow}`,
+          }}>
+            {visitedArr.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "20px 0", color: C.textSoft, fontSize: 13 }}>
+                Visit countries and add memories to track quality here
+              </div>
+            ) : (
+              <div>
+                {/* Summary stats */}
+                <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+                  {[
+                    { label: "Complete", count: visitedArr.filter(c => getMemoryScore(c.memory).stars === 5).length, color: "#D4A520" },
+                    { label: "Rich", count: visitedArr.filter(c => getMemoryScore(c.memory).stars === 4).length, color: C.accent },
+                    { label: "Detailed", count: visitedArr.filter(c => getMemoryScore(c.memory).stars === 3).length, color: "#6B7FBF" },
+                    { label: "Basic", count: visitedArr.filter(c => getMemoryScore(c.memory).stars <= 2).length, color: C.textMuted },
+                  ].map((s, i) => (
+                    <div key={i} style={{ flex: "1 1 60px", textAlign: "center", padding: "10px 8px", borderRadius: 10, background: `${s.color}08` }}>
+                      <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.count}</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: s.color }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+                {/* Individual memory quality list */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {visitedArr.map(c => {
+                    const score = getMemoryScore(c.memory);
+                    const sLevel = getStickerLevel(c.memory);
+                    return (
+                      <div key={c.id} style={{
+                        display: "flex", alignItems: "center", gap: 10, padding: "8px 10px",
+                        borderRadius: 10, background: score.stars >= 5 ? `${C.accent}06` : "transparent",
+                      }}>
+                        <span style={{ fontSize: 18 }}>{c.sticker.icon}</span>
+                        <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.text }}>{c.name}</span>
+                        <span style={{ fontSize: 12, color: C.textMuted }}>{score.label}</span>
+                        <span style={{ fontSize: 13, letterSpacing: 1 }}>
+                          {"★".repeat(score.stars)}{"☆".repeat(5 - score.stars)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -1527,6 +1862,11 @@ function InteractiveWorldMap() {
       <style>{`
         @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-16px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+        @keyframes holographicShimmer {
+          0% { filter: hue-rotate(0deg) brightness(1); }
+          50% { filter: hue-rotate(15deg) brightness(1.05); }
+          100% { filter: hue-rotate(0deg) brightness(1); }
+        }
         input:focus, textarea:focus { border-color: ${C.accent} !important; box-shadow: 0 0 0 3px rgba(91,140,90,0.1) !important; }
         * { -webkit-font-smoothing: antialiased; }
       `}</style>
