@@ -13,11 +13,16 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
+    const _supabase = window.supabase.createClient(
+      'https://wwrywhzliummlepwozkc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3cnl3aHpsaXVtbWxlcHdvemtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNzkxODUsImV4cCI6MjA4OTk1NTE4NX0.fhWgDwPuLFgROmrOcfBv-Oj6ILd4yyVX9wwNIvl7SAI'
+    );
     const { useState, useEffect, useRef } = React;
 
     const CITIES = [
@@ -551,19 +556,19 @@
       const [sub, ss] = useState(false);
       const [sending, setSending] = useState(false);
       const [err, setErr] = useState("");
-      const h = (ev) => {
+      const h = async (ev) => {
         ev.preventDefault();
         if (!e || !e.includes("@")) return;
         setSending(true);
         setErr("");
-        fetch("https://script.google.com/macros/s/AKfycbw2gvCLf51Nh1qyXsnqjNzlBc5UYbjI2oUYsEsCIj6-Oi3LE1p9MQJtcBOmXrYKjMQc/exec", {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: e })
-        })
-          .then(() => { ss(true); setSending(false); })
-          .catch(() => { setErr("Something went wrong. Please try again."); setSending(false); });
+        try {
+          const { error } = await _supabase.from('waitlist').insert({ email: e, source: 'landing_page' });
+          if (error) {
+            if (error.code === '23505') { ss(true); } // already on waitlist — show success
+            else { setErr("Something went wrong. Please try again."); }
+          } else { ss(true); }
+        } catch { setErr("Something went wrong. Please try again."); }
+        setSending(false);
       };
       if (sub)
         return (
