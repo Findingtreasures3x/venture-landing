@@ -312,9 +312,9 @@ export default function WorldMapPage() {
 
   // Tabs
   const tabs = [
-    { id: 'map', label: 'Map', icon: 'ð' },
-    { id: 'collection', label: 'Collection', icon: 'ð' },
-    { id: 'passport', label: 'Passport', icon: 'ð' },
+    { id: 'map', label: 'Map', icon: '🌍' },
+    { id: 'collection', label: 'Collection', icon: '🏆' },
+    { id: 'passport', label: 'Passport', icon: '📖' },
   ]
 
   return (
@@ -352,7 +352,7 @@ export default function WorldMapPage() {
         <div style={styles.headerRight}>
           {/* Search */}
           <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowSearch(!showSearch)} style={styles.iconBtn}>ð</button>
+            <button onClick={() => setShowSearch(!showSearch)} style={styles.iconBtn}>🔍</button>
             {showSearch && (
               <div style={styles.searchDropdown}>
                 <input
@@ -422,9 +422,9 @@ export default function WorldMapPage() {
           {/* Zoom controls */}
           <div style={styles.zoomControls}>
             <button onClick={() => setTransform(p => ({ ...p, k: Math.min(8, p.k * 1.3) }))} style={styles.zoomBtn}>+</button>
-            <button onClick={() => setTransform(p => ({ ...p, k: Math.max(1, p.k * 0.77) }))} style={styles.zoomBtn}>â</button>
+            <button onClick={() => setTransform(p => ({ ...p, k: Math.max(1, p.k * 0.77) }))} style={styles.zoomBtn}>−</button>
             {transform.k > 1 && (
-              <button onClick={resetZoom} style={styles.zoomBtn}>âº</button>
+              <button onClick={resetZoom} style={styles.zoomBtn}>↺</button>
             )}
           </div>
 
@@ -439,7 +439,7 @@ export default function WorldMapPage() {
               <div>
                 <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text)' }}>{COUNTRY_DATA[hovered].name}</div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                  {visited.has(hovered) ? 'â Visited â click to remove' : 'Click to mark as visited'}
+                  {visited.has(hovered) ? '✓ Visited — click to remove' : 'Click to mark as visited'}
                 </div>
               </div>
             </div>
@@ -535,7 +535,7 @@ export default function WorldMapPage() {
   )
 }
 
-// âââ Collection View âââ
+// ─── Collection View ───
 function CollectionView({ visited }) {
   const byCont = {}
   visited.forEach(id => {
@@ -598,14 +598,14 @@ function CollectionView({ visited }) {
   )
 }
 
-// âââ Passport View âââ
+// ─── Passport View ───
 function PassportView({ visited, memories }) {
   const visitedArr = [...visited].filter(id => COUNTRY_DATA[id])
 
   if (visitedArr.length === 0) {
     return (
       <div style={{ padding: '60px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>ð</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>📖</div>
         <h3 style={{ fontSize: 20, fontWeight: 700, fontFamily: 'var(--f-display)', color: 'var(--text)' }}>
           Your passport is empty
         </h3>
@@ -619,7 +619,7 @@ function PassportView({ visited, memories }) {
   return (
     <div style={{ padding: '24px 32px', overflowY: 'auto', maxHeight: 'calc(100vh - 60px)' }}>
       <h2 style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--f-display)', marginBottom: 24 }}>
-        Your Passport â {visitedArr.length} stamps
+        Your Passport — {visitedArr.length} stamps
       </h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
         {visitedArr.map(id => {
@@ -647,10 +647,10 @@ function PassportView({ visited, memories }) {
                 </p>
               )}
               {mem?.location && (
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>ð {mem.location}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>📍 {mem.location}</div>
               )}
               {mem?.date && (
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>ð {mem.date}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>📅 {mem.date}</div>
               )}
               <div style={{
                 marginTop: 10,

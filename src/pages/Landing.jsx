@@ -6,16 +6,16 @@ import { useAuth } from '../lib/AuthContext'
 import AuthModal from '../components/AuthModal'
 
 const CITIES = [
-  { emoji: 'ð½', name: 'NYC', color: '#5B8C5A' },
-  { emoji: 'ð´', name: 'Miami', color: '#00897B' },
-  { emoji: 'ð¼', name: 'Paris', color: '#8E24AA' },
-  { emoji: 'ð', name: 'SF', color: '#D4880A' },
-  { emoji: 'â°ï¸', name: 'Denver', color: '#2D7D46' },
-  { emoji: 'ð¯', name: 'Tokyo', color: '#1A3A5C' },
-  { emoji: 'ðº', name: 'Honolulu', color: '#E84393' },
-  { emoji: 'ðï¸', name: 'Rome', color: '#C0392B' },
-  { emoji: 'ð­', name: 'London', color: '#5B6ABF' },
-  { emoji: 'ð®', name: 'Mexico City', color: '#3A7A39' },
+  { emoji: '🗽', name: 'NYC', color: '#5B8C5A' },
+  { emoji: '🌴', name: 'Miami', color: '#00897B' },
+  { emoji: '🗼', name: 'Paris', color: '#8E24AA' },
+  { emoji: '🌉', name: 'SF', color: '#D4880A' },
+  { emoji: '⛰️', name: 'Denver', color: '#2D7D46' },
+  { emoji: '🏯', name: 'Tokyo', color: '#1A3A5C' },
+  { emoji: '🌺', name: 'Honolulu', color: '#E84393' },
+  { emoji: '🏛️', name: 'Rome', color: '#C0392B' },
+  { emoji: '🎭', name: 'London', color: '#5B6ABF' },
+  { emoji: '🌮', name: 'Mexico City', color: '#3A7A39' },
 ]
 
 const VENTURES = [
@@ -23,7 +23,7 @@ const VENTURES = [
     title: 'Midnight in Kyoto',
     loc: 'Kyoto, Japan',
     date: 'Oct 12',
-    emoji: 'â©ï¸',
+    emoji: '⛩️',
     color: '#C07654',
     accent: '#D4A07A',
     sticker: 'Wabi-Sabi',
@@ -34,7 +34,7 @@ const VENTURES = [
     title: 'First Time in Patagonia',
     loc: 'Torres del Paine, Chile',
     date: 'Jan 24',
-    emoji: 'ðï¸',
+    emoji: '🏔️',
     color: '#5B8C5A',
     accent: '#8BB58A',
     sticker: 'Tierra del Fuego',
@@ -45,7 +45,7 @@ const VENTURES = [
     title: 'Medina Wandering',
     loc: 'Marrakech, Morocco',
     date: 'Mar 5',
-    emoji: 'ð«',
+    emoji: '🫖',
     color: '#6B7FBF',
     accent: '#A0B0E0',
     sticker: 'Medina Walker',
@@ -55,10 +55,10 @@ const VENTURES = [
 ]
 
 const PERSONAS = [
-  { emoji: 'ð', title: 'Couples', desc: 'Turn your trips together into a shared memory book. Every country you visit becomes a page you\'ll look back on together.' },
-  { emoji: 'ð¥', title: 'Friend Groups', desc: 'One passport for the whole crew. Add your photos and memories from the same trip, all in one place.' },
-  { emoji: 'ð§­', title: 'Solo Explorers', desc: 'Build your personal passport. Track every country, add your photos and stories. Your map fills up as you go.' },
-  { emoji: 'ð', title: 'Travel Collectors', desc: 'See your world come together â countries visited, continents explored. Venture makes your travel record tangible and beautiful.' },
+  { emoji: '💑', title: 'Couples', desc: 'Turn your trips together into a shared memory book. Every country you visit becomes a page you\'ll look back on together.' },
+  { emoji: '👥', title: 'Friend Groups', desc: 'One passport for the whole crew. Add your photos and memories from the same trip, all in one place.' },
+  { emoji: '🧭', title: 'Solo Explorers', desc: 'Build your personal passport. Track every country, add your photos and stories. Your map fills up as you go.' },
+  { emoji: '🌍', title: 'Travel Collectors', desc: 'See your world come together — countries visited, continents explored. Venture makes your travel record tangible and beautiful.' },
 ]
 
 function useInView(t = 0.05) {
@@ -109,7 +109,6 @@ function MiniSticker({ emoji, color, size = 52 }) {
 function MapPreview() {
   const [worldData, setWorldData] = useState(null)
   const W = 960, H = 500
-
   const sampleVisited = new Set(['840','076','380','392','504','710','036','356','250','276','764','032'])
   const sampleColors = {
     '840': '#5B8C5A', '076': '#5B8C5A', '032': '#5B8C5A',
@@ -118,17 +117,14 @@ function MapPreview() {
     '504': '#C07654', '710': '#C07654',
     '036': '#00897B',
   }
-
   const projection = useMemo(() => geoNaturalEarth1().scale(155).translate([W / 2, H / 2]), [])
   const path = useMemo(() => geoPath(projection), [projection])
-
   useEffect(() => {
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       .then(r => r.json())
       .then(topology => setWorldData(feature(topology, topology.objects.countries)))
       .catch(() => {})
   }, [])
-
   return (
     <div style={{
       position: 'relative', width: '100%', maxWidth: 560, aspectRatio: '16/9',
@@ -242,7 +238,7 @@ export default function Landing() {
             background: 'rgba(91,140,90,0.08)', border: '1px solid var(--border)',
             borderRadius: 20, padding: '6px 16px', marginBottom: 28,
           }}>
-            <span style={{ fontSize: 12 }}>ð</span>
+            <span style={{ fontSize: 12 }}>📍</span>
             <span style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 600 }}>A new way to keep your adventures</span>
           </div>
         </FadeIn>
@@ -264,7 +260,7 @@ export default function Landing() {
             maxWidth: 520, lineHeight: 1.65, marginBottom: 36,
           }}>
             Turn your travels into a personal passport. Click a country, add your photos and stories,
-            and build a beautiful collection of everywhere you've been â one memory at a time.
+            and build a beautiful collection of everywhere you've been — one memory at a time.
           </p>
         </FadeIn>
         <FadeIn delay={0.55}>
@@ -323,9 +319,9 @@ export default function Landing() {
           </p>
         </FadeIn>
         {[
-          { num: 1, icon: 'ð', title: 'Pick a country', desc: 'Click anywhere on the interactive world map. Every country is a blank page waiting for your story.' },
-          { num: 2, icon: 'ð¸', title: 'Add your memory', desc: 'Upload your photos, write what you remember, mark the date and city. Make it yours.' },
-          { num: 3, icon: 'ð', title: 'Build your passport portfolio', desc: 'Each country becomes a passport page with your photos, words, and a collectible sticker. Watch your collection grow.' },
+          { num: 1, icon: '🌍', title: 'Pick a country', desc: 'Click anywhere on the interactive world map. Every country is a blank page waiting for your story.' },
+          { num: 2, icon: '📸', title: 'Add your memory', desc: 'Upload your photos, write what you remember, mark the date and city. Make it yours.' },
+          { num: 3, icon: '📖', title: 'Build your passport portfolio', desc: 'Each country becomes a passport page with your photos, words, and a collectible sticker. Watch your collection grow.' },
         ].map((s, i) => (
           <FadeIn key={i} delay={i * 0.05}>
             <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '18px 0' }}>
@@ -351,7 +347,7 @@ export default function Landing() {
             <p style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', marginBottom: 10 }}>WHAT YOU GET</p>
             <h2 style={{ fontSize: 32, fontWeight: 700, fontFamily: 'var(--f-display)', letterSpacing: '-0.02em' }}>Your passport, your story</h2>
             <p style={{ color: 'var(--text-soft)', fontSize: 14, maxWidth: 440, margin: '8px auto 0', lineHeight: 1.6 }}>
-              Every country you visit becomes a passport page â with your photos, your words, and a collectible sticker you'll never forget.
+              Every country you visit becomes a passport page — with your photos, your words, and a collectible sticker you'll never forget.
             </p>
           </div>
         </FadeIn>
@@ -424,7 +420,7 @@ export default function Landing() {
                 textAlign: 'center', marginTop: 16, color: 'var(--accent)',
                 fontSize: 14, fontWeight: 600,
               }}>
-                Click to open full interactive map â
+                Click to open full interactive map →
               </div>
             </div>
           </div>
@@ -461,7 +457,7 @@ export default function Landing() {
           <p style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', marginBottom: 10 }}>WHY VENTURE</p>
           <h2 style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--f-display)', letterSpacing: '-0.02em', marginBottom: 8 }}>You've tried everything else.</h2>
           <p style={{ color: 'var(--text-soft)', fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
-            Here's where your travel memories go right now â and how Venture is different.
+            Here's where your travel memories go right now — and how Venture is different.
           </p>
         </FadeIn>
         <div style={{ background: 'rgba(91,140,90,0.04)', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
@@ -584,7 +580,7 @@ export default function Landing() {
           </svg>
           <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-muted)' }}>VENTURE</span>
         </div>
-        <p style={{ color: 'rgba(91,140,90,0.15)', fontSize: 11 }}>Â© 2026 Venture Â· Go somewhere worth remembering</p>
+        <p style={{ color: 'rgba(91,140,90,0.15)', fontSize: 11 }}>© 2026 Venture · Go somewhere worth remembering</p>
       </footer>
 
       {/* Auth Modal */}
