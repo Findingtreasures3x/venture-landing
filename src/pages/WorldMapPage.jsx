@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { geoNaturalEarth1, geoPath } from 'd3-geo'
+import { feature } from 'topojson-client'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import { COUNTRY_DATA } from '../data/countries'
@@ -9,6 +12,7 @@ const width = 960
 const height = 500
 
 export default function WorldMapPage() {
+  const navigate = useNavigate()
   const { session, passportId } = useAuth()
   const [worldData, setWorldData] = useState(null)
   const [visited, setVisited] = useState(new Set())
@@ -31,30 +35,14 @@ export default function WorldMapPage() {
   const [authChecked, setAuthChecked] = useState(false)
   const mapRef = useRef(null)
 
-  // D3 projection
+  // D3 projection (static imports)
   const projection = useMemo(() => {
-    if (typeof window === 'undefined') return null
-    const d3 = window.__d3
-    if (!d3) return null
-    return d3.geoNaturalEarth1().scale(155).translate([width / 2, height / 2])
+    return geoNaturalEarth1().scale(155).translate([width / 2, height / 2])
   }, [])
 
   const pathGenerator = useMemo(() => {
-    if (!projection) return null
-    const d3 = window.__d3
-    if (!d3) return null
-    return d3.geoPath(projection)
+    return geoPath(projection)
   }, [projection])
-
-  // Load d3 dynamically
-  useEffect(() => {
-    if (window.__d3) return
-    import('d3-geo').then(d3Geo => {
-      window.__d3 = d3Geo
-      // Force re-render
-      setWorldData(prev => prev ? { ...prev } : prev)
-    })
-  }, [])
 
   // Auth check
   useEffect(() => {
@@ -139,28 +127,10 @@ export default function WorldMapPage() {
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       .then(r => r.json())
       .then(topology => {
-        const countries = topology.objects.countries
-        const arcs = topology.arcs
-        const decodedArcs = arcs.map(arc => {
-          let x = 0, y = 0
-          return arc.map(([dx, dy]) => {
-            x += dx; y += dy
-            return [
-              topology.transform.translate[0] + x * topology.transform.scale[0],
-              topology.transform.translate[1] + y * topology.transform.scale[1]
-            ]
-          })
-        })
-        function arcToCoords(i) { return i >= 0 ? decodedArcs[i] : [...decodedArcs[~i]].reverse() }
-        function ringToCoords(ring) { let c = []; ring.forEach(i => { c = c.concat(arcToCoords(i)) }); return c }
-        const features = countries.geometries.map(geom => {
-          let coordinates
-          if (geom.type === 'Polygon') coordinates = geom.arcs.map(r => ringToCoords(r))
-          else if (geom.type === 'MultiPolygon') coordinates = geom.arcs.map(p => p.map(r => ringToCoords(r)))
-          return { type: 'Feature', id: geom.id, properties: { name: COUNTRY_DATA[geom.id]?.name || `${geom.id}` }, geometry: { type: geom.type, coordinates } }
-        })
-        setWorldData({ type: 'FeatureCollection', features })
+        const geojson = feature(topology, topology.objects.countries)
+        setWorldData(geojson)
       })
+      .catch(err => console.error('Failed to load world data:', err))
   }, [])
 
   // Persist localStorage for guests
@@ -342,9 +312,9 @@ export default function WorldMapPage() {
 
   // Tabs
   const tabs = [
-    { id: 'map', label: 'Map', icon: '🌍' },
-    { id: 'collection', label: 'Collection', icon: '🏆' },
-    { id: 'passport', label: 'Passport', icon: '📖' },
+    { id: 'map', label: 'Map', icon: 'ð' },
+    { id: 'collection', label: 'Collection', icon: 'ð' },
+    { id: 'passport', label: 'Passport', icon: 'ð' },
   ]
 
   return (
@@ -353,7 +323,10 @@ export default function WorldMapPage() {
       <div style={styles.header}>
         <div style={styles.headerLeft}>
           {!session && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+              onClick={() => navigate('/')}
+            >
               <svg width={18} height={22} viewBox="0 0 100 120" fill="none" stroke="var(--accent)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 10 L50 75 L85 10" />
                 <ellipse cx="50" cy="95" rx="20" ry="8" />
@@ -379,7 +352,7 @@ export default function WorldMapPage() {
         <div style={styles.headerRight}>
           {/* Search */}
           <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowSearch(!showSearch)} style={styles.iconBtn}>🔍</button>
+            <button onClick={() => setShowSearch(!showSearch)} style={styles.iconBtn}>ð</button>
             {showSearch && (
               <div style={styles.searchDropdown}>
                 <input
@@ -449,9 +422,9 @@ export default function WorldMapPage() {
           {/* Zoom controls */}
           <div style={styles.zoomControls}>
             <button onClick={() => setTransform(p => ({ ...p, k: Math.min(8, p.k * 1.3) }))} style={styles.zoomBtn}>+</button>
-            <button onClick={() => setTransform(p => ({ ...p, k: Math.max(1, p.k * 0.77) }))} style={styles.zoomBtn}>−</button>
+            <button onClick={() => setTransform(p => ({ ...p, k: Math.max(1, p.k * 0.77) }))} style={styles.zoomBtn}>â</button>
             {transform.k > 1 && (
-              <button onClick={resetZoom} style={styles.zoomBtn}>↺</button>
+              <button onClick={resetZoom} style={styles.zoomBtn}>âº</button>
             )}
           </div>
 
@@ -466,7 +439,7 @@ export default function WorldMapPage() {
               <div>
                 <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text)' }}>{COUNTRY_DATA[hovered].name}</div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                  {visited.has(hovered) ? '✓ Visited — click to remove' : 'Click to mark as visited'}
+                  {visited.has(hovered) ? 'â Visited â click to remove' : 'Click to mark as visited'}
                 </div>
               </div>
             </div>
@@ -562,7 +535,7 @@ export default function WorldMapPage() {
   )
 }
 
-// ─── Collection View ───
+// âââ Collection View âââ
 function CollectionView({ visited }) {
   const byCont = {}
   visited.forEach(id => {
@@ -625,14 +598,14 @@ function CollectionView({ visited }) {
   )
 }
 
-// ─── Passport View ───
+// âââ Passport View âââ
 function PassportView({ visited, memories }) {
   const visitedArr = [...visited].filter(id => COUNTRY_DATA[id])
 
   if (visitedArr.length === 0) {
     return (
       <div style={{ padding: '60px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📖</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>ð</div>
         <h3 style={{ fontSize: 20, fontWeight: 700, fontFamily: 'var(--f-display)', color: 'var(--text)' }}>
           Your passport is empty
         </h3>
@@ -646,7 +619,7 @@ function PassportView({ visited, memories }) {
   return (
     <div style={{ padding: '24px 32px', overflowY: 'auto', maxHeight: 'calc(100vh - 60px)' }}>
       <h2 style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--f-display)', marginBottom: 24 }}>
-        Your Passport — {visitedArr.length} stamps
+        Your Passport â {visitedArr.length} stamps
       </h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
         {visitedArr.map(id => {
@@ -674,10 +647,10 @@ function PassportView({ visited, memories }) {
                 </p>
               )}
               {mem?.location && (
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>📍 {mem.location}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>ð {mem.location}</div>
               )}
               {mem?.date && (
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>📅 {mem.date}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>ð {mem.date}</div>
               )}
               <div style={{
                 marginTop: 10,
