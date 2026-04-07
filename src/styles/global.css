@@ -1,0 +1,77 @@
+/* ─── Venture Global Styles ─── */
+:root {
+  --f-display: 'Fraunces', Georgia, serif;
+  --f-body: 'DM Sans', -apple-system, sans-serif;
+  --f-ui: 'Inter', -apple-system, sans-serif;
+
+  --bg: #F6F3ED;
+  --bg-deep: #EDE8DF;
+  --card: #FFFFFF;
+  --text: #1F2E3D;
+  --text-soft: #566B7F;
+  --text-muted: #8A9BAD;
+  --accent: #5B8C5A;
+  --accent-warm: #C07654;
+  --accent-soft: #8BB58A;
+  --ocean: #DFE9F0;
+  --land: #E2DDD5;
+  --land-hover: #D5CFC5;
+  --border: #DDD6CB;
+  --border-light: #EDE8DF;
+  --shadow: rgba(58,74,92,0.06);
+  --shadow-deep: rgba(58,74,92,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+}
