@@ -67,13 +67,27 @@ function useInView(t = 0.05) {
   useEffect(() => {
     const e = r.current
     if (!e) return
+
+    const check = () => {
+      const rect = e.getBoundingClientRect()
+      if (rect.top < window.innerHeight + 80 && rect.bottom > -80) {
+        s(true)
+        return true
+      }
+      return false
+    }
+
+    if (check()) return
+
     const o = new IntersectionObserver(([en]) => {
-      if (en.isIntersecting) { s(true); o.disconnect() }
-    }, { threshold: t, rootMargin: '0px 0px 80px 0px' })
+      if (en.isIntersecting) { s(true); o.disconnect(); window.removeEventListener('scroll', onScroll) }
+    }, { threshold: t, rootMargin: '80px 0px 80px 0px' })
     o.observe(e)
-    const rect = e.getBoundingClientRect()
-    if (rect.top < window.innerHeight && rect.bottom > 0) s(true)
-    return () => o.disconnect()
+
+    const onScroll = () => { if (check()) { o.disconnect(); window.removeEventListener('scroll', onScroll) } }
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => { o.disconnect(); window.removeEventListener('scroll', onScroll) }
   }, [])
   return [r, v]
 }
@@ -168,13 +182,15 @@ export default function Landing() {
   const { session } = useAuth()
   const [showAuth, setShowAuth] = useState(false)
 
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   const handleAuthSuccess = () => {
     setShowAuth(false)
     navigate('/dashboard')
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', fontFamily: 'var(--f-body)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', fontFamily: 'var(--f-body)', overflow: 'clip' }}>
 
       {/* Nav */}
       <nav style={{
