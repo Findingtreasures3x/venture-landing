@@ -13,7 +13,7 @@ const HEIGHT = 500
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const YEARS = Array.from({ length: 30 }, (_, i) => 2026 - i)
 
-// ─── Region/City data for structured location picker ────────
+// âââ Region/City data for structured location picker ââââââââ
 const REGION_DATA = {
   "840": { regions: [
     { name: "Alabama", cities: ["Birmingham", "Montgomery", "Huntsville", "Mobile"] },
@@ -183,7 +183,7 @@ const REGION_DATA = {
   ]},
 }
 
-// ─── Country center coordinates [lng, lat] for search-zoom ──
+// âââ Country center coordinates [lng, lat] for search-zoom ââ
 const COUNTRY_COORDS = {
   "004": [67, 33], "008": [20, 41], "012": [3, 28], "024": [17.5, -12.5],
   "032": [-64, -34], "031": [48, 40.5], "036": [134, -25], "040": [14.5, 47.5],
@@ -229,7 +229,7 @@ const COUNTRY_COORDS = {
   "716": [29.8, -19.8],
 }
 
-// ─── Image Compression Helper ───────────────────────────────
+// âââ Image Compression Helper âââââââââââââââââââââââââââââââ
 const compressImage = async (file) => {
   return new Promise((resolve) => {
     const reader = new FileReader()
@@ -252,7 +252,7 @@ const compressImage = async (file) => {
   })
 }
 
-// ─── Gamification Functions ─────────────────────────────────
+// âââ Gamification Functions âââââââââââââââââââââââââââââââââ
 function calculateXP(visited, memories) {
   let xp = 0
   visited.forEach(id => {
@@ -282,7 +282,7 @@ function getTier(count) {
   return { name: "Starter", icon: "\uD83D\uDDFA\uFE0F", color: "#E8E8E8", colorSolid: "#999", colorBg: "#F5F5F5", next: 5, threshold: 0 }
 }
 
-// ─── Regional Collections ────────────────────────────────────
+// âââ Regional Collections ââââââââââââââââââââââââââââââââââââ
 const COLLECTIONS = [
   { id: "europe", name: "European Grand Tour", icon: "\uD83C\uDFF0", desc: "Master the old continent", continent: "Europe", target: 10 },
   { id: "asia", name: "Silk Road Explorer", icon: "\uD83D\uDC09", desc: "Journey through the East", continent: "Asia", target: 8 },
@@ -301,7 +301,7 @@ function getCollectionProgress(visitedSet) {
   })
 }
 
-// ─── Memory Quality Score ────────────────────────────────────
+// âââ Memory Quality Score ââââââââââââââââââââââââââââââââââââ
 function getMemoryScore(memory) {
   if (!memory) return { score: 0, level: "empty", stars: 0, label: "No memory" }
   let pts = 0
@@ -321,7 +321,7 @@ function getMemoryScore(memory) {
   return { score: pts, ...levels[pts] }
 }
 
-// ─── Sticker Evolution ───────────────────────────────────────
+// âââ Sticker Evolution âââââââââââââââââââââââââââââââââââââââ
 function getStickerLevel(memory) {
   if (!memory) return 0
   const hasNote = !!memory.note
@@ -341,9 +341,9 @@ const stickerStyles = [
   (color) => ({ border: `3px solid ${color}`, background: `linear-gradient(135deg, ${color}20, #fff, ${color}15)`, boxShadow: `0 4px 20px ${color}30, inset 0 1px 2px rgba(255,255,255,0.6)`, animation: "holographicShimmer 3s ease infinite" }),
 ]
 
-// ═══════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 export default function WorldMapPage() {
   const navigate = useNavigate()
   const { session, passportId } = useAuth()
@@ -375,7 +375,7 @@ export default function WorldMapPage() {
   const projection = useMemo(() => geoNaturalEarth1().scale(155).translate([WIDTH / 2, HEIGHT / 2]), [])
   const pathGenerator = useMemo(() => geoPath(projection), [projection])
 
-  // ─── Derived state ───
+  // âââ Derived state âââ
   const conts = useMemo(() => new Set([...visited].map(id => COUNTRY_DATA[id]?.continent).filter(Boolean)), [visited])
   const xp = useMemo(() => calculateXP(visited, memories), [visited, memories])
   const title = useMemo(() => getTitle(xp), [xp])
@@ -451,7 +451,7 @@ export default function WorldMapPage() {
       .then(r => r.json())
       .then(topology => setWorldData(feature(topology, topology.objects.countries)))
       .catch(err => console.error('Failed to load world data:', err))
-  }, []); window._b64.length)
+  }, [])
 
   // Persist localStorage for guests
   useEffect(() => { if (!dataLoaded || session) return; try { localStorage.setItem('VENTURE_visited', JSON.stringify([...visited])) } catch {} }, [visited, session, dataLoaded])
@@ -568,13 +568,13 @@ export default function WorldMapPage() {
 
   const unlockedC = lastUnlocked ? COUNTRY_DATA[lastUnlocked] : null
 
-  // ═══════════════════════════════════════════════════════════════
+  // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   // RENDER
-  // ═══════════════════════════════════════════════════════════════
+  // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-      {/* ─── Keyframe animations ─── */}
+      {/* âââ Keyframe animations âââ */}
       <style>{`
         @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-16px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
@@ -583,10 +583,10 @@ export default function WorldMapPage() {
         * { -webkit-font-smoothing: antialiased; }
       `}</style>
 
-      {/* ─── Auth Modal ─── */}
+      {/* âââ Auth Modal âââ */}
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />}
 
-      {/* ─── Top Bar ─── */}
+      {/* âââ Top Bar âââ */}
       <div style={{ width: '100%', maxWidth: 960, padding: '16px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => navigate('/')}>
           <svg width={20} height={24} viewBox="0 0 100 120" fill="none" stroke={C.accent} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round">
@@ -604,7 +604,7 @@ export default function WorldMapPage() {
         )}
       </div>
 
-      {/* ─── Header ─── */}
+      {/* âââ Header âââ */}
       <div style={{ padding: '16px 16px 0', textAlign: 'center', width: '100%', maxWidth: 960 }}>
         <h1 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, margin: 0, color: C.text, lineHeight: 1.2 }}>Your World Map</h1>
         <p style={{ color: C.textSoft, fontSize: 14, margin: '8px 0 0', fontWeight: 400, lineHeight: 1.5 }}>
@@ -615,7 +615,7 @@ export default function WorldMapPage() {
         </p>
       </div>
 
-      {/* ─── Stats Bar ─── */}
+      {/* âââ Stats Bar âââ */}
       <div style={{ display: 'flex', gap: 0, margin: '20px 16px 0', background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: `0 2px 12px ${C.shadow}`, overflow: 'hidden', flexWrap: 'wrap', width: 'calc(100% - 32px)', maxWidth: 700 }}>
         {[
           { value: visited.size, label: 'of 195 countries' },
@@ -630,7 +630,7 @@ export default function WorldMapPage() {
         ))}
       </div>
 
-      {/* ─── Tier Badge ─── */}
+      {/* âââ Tier Badge âââ */}
       {visited.size > 0 && (
         <div style={{ margin: '12px 16px 0', padding: '14px 20px', background: tier.colorBg, borderRadius: 14, border: `1px solid ${tier.colorSolid}25`, display: 'flex', alignItems: 'center', gap: 14, maxWidth: 700, width: 'calc(100% - 32px)' }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: `${tier.colorSolid}15`, border: `2px solid ${tier.colorSolid}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{tier.icon}</div>
@@ -650,7 +650,7 @@ export default function WorldMapPage() {
         </div>
       )}
 
-      {/* ─── Tab Toggle + Search ─── */}
+      {/* âââ Tab Toggle + Search âââ */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 16px 0', flexWrap: 'wrap', justifyContent: 'center' }}>
         <div style={{ display: 'flex', background: C.bgDeep, borderRadius: 12, padding: 3, gap: 2 }}>
           {['map', 'passport', 'collections'].map(tab => (
@@ -709,7 +709,7 @@ export default function WorldMapPage() {
         )}
       </div>
 
-      {/* ═══════════ MAP TAB ═══════════ */}
+      {/* âââââââââââ MAP TAB âââââââââââ */}
       {activeTab === 'map' && (
         <div style={{ width: '100%', maxWidth: 960, margin: '16px auto 0', position: 'relative', padding: '0 8px' }}>
           <svg ref={mapRef} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -748,7 +748,7 @@ export default function WorldMapPage() {
                 <div style={{ fontSize: 11, color: C.textSoft }}>
                   {visited.has(hovered) ? (() => {
                     const score = getMemoryScore(memories[hovered])
-                    return `\u2713 Visited \u00B7 ${"★".repeat(score.stars)}${"☆".repeat(5 - score.stars)} ${score.label}`
+                    return `\u2713 Visited \u00B7 ${"â".repeat(score.stars)}${"â".repeat(5 - score.stars)} ${score.label}`
                   })() : 'Click to mark as visited'}
                 </div>
               </div>
@@ -757,7 +757,7 @@ export default function WorldMapPage() {
         </div>
       )}
 
-      {/* ═══════════ PASSPORT TAB ═══════════ */}
+      {/* âââââââââââ PASSPORT TAB âââââââââââ */}
       {activeTab === 'passport' && (
         <div style={{ width: '100%', maxWidth: 700, padding: '20px 16px' }}>
           {visitedArr.length === 0 ? (
@@ -796,7 +796,7 @@ export default function WorldMapPage() {
                         <div style={{ fontSize: 13, color, fontWeight: 600 }}>{c.sticker?.title}</div>
                         <div style={{ fontSize: 12, color: C.textSoft, fontStyle: 'italic' }}>{c.sticker?.desc}</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-                          <span style={{ fontSize: 13, letterSpacing: 1 }}>{"★".repeat(score.stars)}{"☆".repeat(5 - score.stars)}</span>
+                          <span style={{ fontSize: 13, letterSpacing: 1 }}>{"â".repeat(score.stars)}{"â".repeat(5 - score.stars)}</span>
                           <span style={{ fontSize: 11, color: C.textMuted }}>{score.label}</span>
                           <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: `${color}12`, color, fontWeight: 700 }}>Lv.{sLevel}</span>
                         </div>
@@ -898,7 +898,7 @@ export default function WorldMapPage() {
         </div>
       )}
 
-      {/* ═══════════ COLLECTIONS TAB ═══════════ */}
+      {/* âââââââââââ COLLECTIONS TAB âââââââââââ */}
       {activeTab === 'collections' && (
         <div style={{ width: '100%', maxWidth: 700, padding: '20px 16px' }}>
           {/* Tier Overview Card */}
@@ -991,7 +991,7 @@ export default function WorldMapPage() {
                         <span style={{ fontSize: 18 }}>{c.sticker?.icon}</span>
                         <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.text }}>{c.name}</span>
                         <span style={{ fontSize: 12, color: C.textMuted }}>{score.label}</span>
-                        <span style={{ fontSize: 13, letterSpacing: 1 }}>{"★".repeat(score.stars)}{"☆".repeat(5 - score.stars)}</span>
+                        <span style={{ fontSize: 13, letterSpacing: 1 }}>{"â".repeat(score.stars)}{"â".repeat(5 - score.stars)}</span>
                       </div>
                     )
                   })}
@@ -1002,7 +1002,7 @@ export default function WorldMapPage() {
         </div>
       )}
 
-      {/* ─── Bottom Actions ─── */}
+      {/* âââ Bottom Actions âââ */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', padding: '20px 16px 40px' }}>
         {visited.size >= 1 && (
           <button onClick={() => setShowShareCard(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px', borderRadius: 14, border: 'none', background: C.accent, color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 20px rgba(91,140,90,0.25)' }}>
@@ -1016,7 +1016,7 @@ export default function WorldMapPage() {
         )}
       </div>
 
-      {/* ─── Toast ─── */}
+      {/* âââ Toast âââ */}
       {showToast && unlockedC && (
         <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: C.card, border: `1px solid ${C.cont[unlockedC.continent]}35`, borderRadius: 16, padding: '14px 22px', display: 'flex', alignItems: 'center', gap: 14, zIndex: 100, animation: 'slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)', boxShadow: `0 12px 40px ${C.shadowDeep}` }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: `${C.cont[unlockedC.continent]}12`, border: `2px solid ${C.cont[unlockedC.continent]}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>{unlockedC.sticker?.icon}</div>
@@ -1028,7 +1028,7 @@ export default function WorldMapPage() {
         </div>
       )}
 
-      {/* ─── Memory Modal (Journal-Style) ─── */}
+      {/* âââ Memory Modal (Journal-Style) âââ */}
       {showMemoryModal && COUNTRY_DATA[showMemoryModal] && (() => {
         const mc = COUNTRY_DATA[showMemoryModal]
         const color = C.cont[mc.continent]
@@ -1163,7 +1163,7 @@ export default function WorldMapPage() {
         )
       })()}
 
-      {/* ─── Share Card Modal ─── */}
+      {/* âââ Share Card Modal âââ */}
       {showShareCard && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(58,74,92,0.25)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }} onClick={() => setShowShareCard(false)}>
           <div onClick={e => e.stopPropagation()} style={{ background: `linear-gradient(160deg, ${C.card}, ${C.bgDeep})`, borderRadius: 28, padding: '40px 44px', width: 420, maxWidth: '92vw', textAlign: 'center', boxShadow: '0 24px 80px rgba(58,74,92,0.2)', animation: 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
@@ -1193,7 +1193,7 @@ export default function WorldMapPage() {
         </div>
       )}
 
-      {/* ─── Photo Lightbox ─── */}
+      {/* âââ Photo Lightbox âââ */}
       {lightboxPhoto && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(58,74,92,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 250, animation: 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' }} onClick={() => setLightboxPhoto(null)}>
           <div onClick={e => e.stopPropagation()} style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
